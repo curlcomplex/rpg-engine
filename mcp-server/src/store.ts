@@ -5,10 +5,27 @@ import { VERSION } from './types.js';
 
 export class WorldStore {
   private filePath: string;
+  private campaignsDir: string;
   private lockQueue: Promise<void> = Promise.resolve();
 
-  constructor(filePath: string) {
+  constructor(filePath: string, campaignsDir?: string) {
     this.filePath = filePath;
+    this.campaignsDir = campaignsDir || '';
+  }
+
+  /** Switch to a different campaign file. */
+  switchTo(filePath: string): void {
+    this.filePath = filePath;
+  }
+
+  /** Get the current file path. */
+  getFilePath(): string {
+    return this.filePath;
+  }
+
+  /** Get the campaigns directory. */
+  getCampaignsDir(): string {
+    return this.campaignsDir;
   }
 
   /** Acquire exclusive access for a read-modify-write cycle. */

@@ -10,6 +10,8 @@ import {
 import type { NodeType, EdgeType } from './types.js';
 import { resolveAction } from './dice.js';
 import { traceBlocks, detectNeglect, findConflicts, getSceneContext } from './queries.js';
+import { promises as fs } from 'node:fs';
+import { resolve, basename } from 'node:path';
 import {
   logEvent, investigate, interviewNpc, research, moveToLocation, advanceTime,
 } from './narrative.js';
@@ -257,6 +259,41 @@ const TOOLS = [
     inputSchema: {
       type: 'object' as const,
       properties: {},
+    },
+  },
+  // ─── Campaign Management ──────────────────────────────────────────
+  {
+    name: 'list_campaigns',
+    description: 'List all saved campaign files in the campaigns directory.',
+    inputSchema: {
+      type: 'object' as const,
+      properties: {},
+    },
+  },
+  {
+    name: 'new_campaign',
+    description: 'Create a new campaign. Saves current campaign first, then creates a fresh world file.',
+    inputSchema: {
+      type: 'object' as const,
+      properties: {
+        name: { type: 'string', description: 'Campaign name (used as filename, e.g., "morrowind-adventure")' },
+        title: { type: 'string', description: 'Display title for the world (e.g., "Vvardenfell Chronicles")' },
+        genre: { type: 'string', description: 'Genre (e.g., "fantasy", "noir_horror", "sci_fi")' },
+        setting: { type: 'string', description: 'Setting description (e.g., "The island of Vvardenfell, Third Era")' },
+        tone: { type: 'string', description: 'Narrative tone (e.g., "alien, political, mystical")' },
+      },
+      required: ['name', 'title'],
+    },
+  },
+  {
+    name: 'load_campaign',
+    description: 'Switch to an existing campaign. Saves current campaign first.',
+    inputSchema: {
+      type: 'object' as const,
+      properties: {
+        name: { type: 'string', description: 'Campaign name (filename without .rpg extension)' },
+      },
+      required: ['name'],
     },
   },
 ];
@@ -563,6 +600,120 @@ export function createServer(store: WorldStore) {
       case 'advance_time': {
         const result = await advanceTime(store);
         return text(result);
+      }
+
+      // ─── Campaign Management ────────────────────────────────────────
+
+      case 'list_campaigns': {
+        const dir = store.getCampaignsDir();
+        try {
+          const files = await fs.readdir(dir);
+          const campaigns = [];
+          for (const file of files) {
+            if (!file.endsWith('.rpg')) continue;
+            const filePath = resolve(dir, file);
+            const raw = await fs.readFile(filePath, 'utf-8');
+            const doc = JSON.parse(raw);
+            const stat = await fs.stat(filePath);
+            campaigns.push({
+              name: file.replace('.rpg', ''),
+              title: doc.world?.title || 'Untitled',
+              genre: doc.world?.genre || 'unknown',
+              nodes: doc.nodes?.length || 0,
+              edges: doc.edges?.length || 0,
+              last_modified: stat.mtime.toISOString(),
+              is_active: filePath === store.getFilePath(),
+            });
+          }
+          return text({ campaigns, active: basename(store.getFilePath(), '.rpg') });
+        } catch {
+          return text({ campaigns: [], active: basename(store.getFilePath(), '.rpg') });
+        }
+      }
+
+      case 'new_campaign': {
+        if (!args.name) return text({ error: 'name is required' });
+        const campaignName = (args.name as string).toLowerCase().replace(/[^a-z0-9-_]/g, '-');
+        const dir = store.getCampaignsDir();
+        const newPath = resolve(dir, `${campaignName}.rpg`);
+
+        // Check if already exists
+        try {
+          await fs.access(newPath);
+          return text({ error: `Campaign "${campaignName}" already exists. Use load_campaign to switch to it.` });
+        } catch {
+          // Good — doesn't exist yet
+        }
+
+        // Save current campaign to campaigns dir before switching
+        const currentDoc = await store.getDocument();
+        const currentName = basename(store.getFilePath(), '.rpg');
+        const savePath = resolve(dir, `${currentName}.rpg`);
+        await fs.mkdir(dir, { recursive: true });
+        await fs.writeFile(savePath, JSON.stringify(currentDoc, null, 2), 'utf-8');
+
+        // Create new world
+        const { nanoid } = await import('nanoid');
+        const newDoc = {
+          rpg_engine_version: VERSION,
+          created_at: new Date().toISOString(),
+          exported_at: new Date().toISOString(),
+          source: { tool: 'rpg-engine-mcp', tool_version: VERSION },
+          world: {
+            id: `w_${nanoid(16)}`,
+            title: (args.title as string) || 'New World',
+            genre: (args.genre as string) || undefined,
+            setting: (args.setting as string) || undefined,
+            tone: (args.tone as string) || undefined,
+          },
+          player: { character_id: '', session_count: 0, current_act: 1, current_beat: 'opening' },
+          nodes: [] as any[],
+          edges: [] as any[],
+        };
+
+        await fs.writeFile(newPath, JSON.stringify(newDoc, null, 2), 'utf-8');
+        store.switchTo(newPath);
+
+        return text({
+          created: campaignName,
+          world: newDoc.world,
+          previous_campaign_saved: currentName,
+          message: `New campaign "${campaignName}" created and active. Previous campaign "${currentName}" saved. The world is empty — start building!`,
+        });
+      }
+
+      case 'load_campaign': {
+        if (!args.name) return text({ error: 'name is required' });
+        const campaignName = args.name as string;
+        const dir = store.getCampaignsDir();
+        const loadPath = resolve(dir, `${campaignName}.rpg`);
+
+        // Check it exists
+        try {
+          await fs.access(loadPath);
+        } catch {
+          return text({ error: `Campaign "${campaignName}" not found. Use list_campaigns to see available campaigns.` });
+        }
+
+        // Save current campaign first
+        const currentDoc = await store.getDocument();
+        const currentName = basename(store.getFilePath(), '.rpg');
+        const savePath = resolve(dir, `${currentName}.rpg`);
+        await fs.mkdir(dir, { recursive: true });
+        await fs.writeFile(savePath, JSON.stringify(currentDoc, null, 2), 'utf-8');
+
+        // Switch
+        store.switchTo(loadPath);
+        const loadedDoc = await store.getDocument();
+
+        return text({
+          loaded: campaignName,
+          world: loadedDoc.world,
+          nodes: loadedDoc.nodes.length,
+          edges: loadedDoc.edges.length,
+          player: loadedDoc.player,
+          previous_campaign_saved: currentName,
+        });
       }
 
       default:
