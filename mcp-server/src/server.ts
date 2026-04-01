@@ -190,11 +190,16 @@ export function createServer(store: WorldStore) {
   server.setRequestHandler(CallToolRequestSchema, async (request) => {
     const { name, arguments: args = {} } = request.params;
 
+    try {
     switch (name) {
 
       // ─── CRUD ───────────────────────────────────────────────────
 
       case 'create_node': {
+        if (!args.type || !NODE_TYPES.includes(args.type as any))
+          return text({ error: `Invalid type. Valid: ${NODE_TYPES.join(', ')}` });
+        if (!args.title) return text({ error: 'title is required' });
+
         const id = store.nodeId();
         const now = new Date().toISOString();
         const node = await store.addNode({
@@ -230,22 +235,23 @@ export function createServer(store: WorldStore) {
       }
 
       case 'get_node': {
-        const result = await store.getNode(args.node_id as string);
-        if (!result) return text({ error: 'Node not found' });
-
         const doc = await store.getDocument();
-        const enrichedEdges = result.edges.map(e => {
-          const neighborId = e.source === result.node.id ? e.target : e.source;
+        const node = doc.nodes.find(n => n.id === args.node_id);
+        if (!node) return text({ error: 'Node not found' });
+
+        const edges = doc.edges.filter(e => e.source === node.id || e.target === node.id);
+        const enrichedEdges = edges.map(e => {
+          const neighborId = e.source === node.id ? e.target : e.source;
           const neighbor = WorldStore.findNode(doc, neighborId);
           return {
             ...e,
             neighbor_title: neighbor?.title || 'unknown',
             neighbor_type: neighbor?.type || 'unknown',
-            direction: e.source === result.node.id ? 'outgoing' : 'incoming',
+            direction: e.source === node.id ? 'outgoing' : 'incoming',
           };
         });
 
-        return text({ node: result.node, edges: enrichedEdges });
+        return text({ node, edges: enrichedEdges });
       }
 
       case 'update_node': {
@@ -304,14 +310,18 @@ export function createServer(store: WorldStore) {
       // ─── Edges ──────────────────────────────────────────────────
 
       case 'create_edge': {
-        const sourceResult = await store.getNode(args.source_id as string);
-        const targetResult = await store.getNode(args.target_id as string);
-        if (!sourceResult) return text({ error: `Source node ${args.source_id} not found` });
-        if (!targetResult) return text({ error: `Target node ${args.target_id} not found` });
+        const doc = await store.getDocument();
+        const sourceNode = doc.nodes.find(n => n.id === args.source_id);
+        const targetNode = doc.nodes.find(n => n.id === args.target_id);
+        if (!sourceNode) return text({ error: `Source node ${args.source_id} not found` });
+        if (!targetNode) return text({ error: `Target node ${args.target_id} not found` });
 
         let edgeType = args.type as EdgeType | undefined;
+        if (edgeType && !EDGE_TYPES.includes(edgeType as any)) {
+          return text({ error: `Invalid edge type. Valid: ${EDGE_TYPES.join(', ')}` });
+        }
         if (!edgeType) {
-          const key = `${sourceResult.node.type}:${targetResult.node.type}`;
+          const key = `${sourceNode.type}:${targetNode.type}`;
           edgeType = EDGE_TYPE_DEFAULTS[key];
           if (!edgeType) return text({ error: `Cannot infer edge type for ${key}. Specify type explicitly.` });
         }
@@ -385,6 +395,9 @@ export function createServer(store: WorldStore) {
 
       default:
         return text({ error: `Unknown tool: ${name}` });
+    }
+    } catch (err) {
+      return text({ error: String(err) });
     }
   });
 

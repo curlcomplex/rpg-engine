@@ -181,6 +181,8 @@ export interface SceneContext {
     opinion_of_player: number | null;
     desires: string[];
     fears: string[];
+    knows: string[];
+    suspects: string[];
   }>;
   active_objectives: Array<{ id: string; title: string; status: string | undefined }>;
   active_threats: Array<{ id: string; source_title: string; target_title: string }>;
@@ -237,6 +239,12 @@ export function getSceneContext(doc: WorldDocument): SceneContext {
       const fears = doc.edges
         .filter(e => e.type === 'fears' && e.source === npc.id)
         .map(e => findNode(doc, e.target)?.title || 'unknown');
+      const knows = doc.edges
+        .filter(e => e.type === 'knows' && e.source === npc.id)
+        .map(e => findNode(doc, e.target)?.title || 'unknown');
+      const suspects = doc.edges
+        .filter(e => e.type === 'suspects' && e.source === npc.id)
+        .map(e => findNode(doc, e.target)?.title || 'unknown');
 
       npcs_present.push({
         id: npc.id,
@@ -244,6 +252,8 @@ export function getSceneContext(doc: WorldDocument): SceneContext {
         opinion_of_player: (opinionEdge?.properties?.weight as number) ?? null,
         desires,
         fears,
+        knows,
+        suspects,
       });
     }
   }
