@@ -10,6 +10,9 @@ import {
 import type { NodeType, EdgeType } from './types.js';
 import { resolveAction } from './dice.js';
 import { traceBlocks, detectNeglect, findConflicts, getSceneContext } from './queries.js';
+import {
+  logEvent, investigate, interviewNpc, research, moveToLocation, advanceTime,
+} from './narrative.js';
 
 function text(data: unknown) {
   return { content: [{ type: 'text' as const, text: JSON.stringify(data, null, 2) }] };
@@ -172,6 +175,85 @@ const TOOLS = [
   {
     name: 'find_conflicts',
     description: 'Find NPCs with competing desires for the same objectives, plus their opinions of each other.',
+    inputSchema: {
+      type: 'object' as const,
+      properties: {},
+    },
+  },
+  // ─── Narrative Tools ──────────────────────────────────────────────
+  {
+    name: 'log_event',
+    description: 'Record a narrative event. Creates an EVENT node with a THEREFORE or BUT edge from the causing event. All participants get WITNESSED edges. Call this after every significant action to build the causal chain.',
+    inputSchema: {
+      type: 'object' as const,
+      properties: {
+        title: { type: 'string', description: 'Short event title (e.g., "Alyssa discovers sealed case files")' },
+        description: { type: 'string', description: 'What happened, in narrative terms' },
+        causal_type: { type: 'string', enum: ['therefore', 'but'], description: 'THEREFORE = consequence, BUT = complication/reversal. Never AND THEN.' },
+        caused_by_event_id: { type: 'string', description: 'ID of the event that caused this one (for causal chain)' },
+        participant_ids: { type: 'array', items: { type: 'string' }, description: 'IDs of characters who witnessed this event' },
+        tags: { type: 'array', items: { type: 'string' }, description: 'Tags for categorization' },
+      },
+      required: ['title', 'description', 'causal_type'],
+    },
+  },
+  {
+    name: 'investigate',
+    description: 'Search a location for clues and evidence. Makes a Perception/Investigation check. Better rolls reveal more. Creates KNOWS edges for discovered clues.',
+    inputSchema: {
+      type: 'object' as const,
+      properties: {
+        character_id: { type: 'string', description: 'Character doing the investigating' },
+        location_id: { type: 'string', description: 'Location to search' },
+        focus: { type: 'string', description: 'What specifically to look for (narrows results)' },
+        situational_modifier: { type: 'number', description: 'Bonus/penalty from circumstances' },
+      },
+      required: ['character_id', 'location_id'],
+    },
+  },
+  {
+    name: 'interview_npc',
+    description: 'Talk to an NPC to extract information. Social check vs NPC willingness (modified by opinion). NPC only shares what their KNOWS/SUSPECTS edges contain. Opinion shifts based on outcome and approach.',
+    inputSchema: {
+      type: 'object' as const,
+      properties: {
+        character_id: { type: 'string', description: 'Character doing the interviewing' },
+        npc_id: { type: 'string', description: 'NPC to interview' },
+        topic: { type: 'string', description: 'What to ask about (filters NPC knowledge)' },
+        approach: { type: 'string', enum: ['friendly', 'intimidating', 'deceptive'], description: 'Interview approach — affects skill used and opinion change' },
+      },
+      required: ['character_id', 'npc_id'],
+    },
+  },
+  {
+    name: 'research',
+    description: 'Research a topic through records, archives, or databases. Intellect/Research check. Searches all clues matching the topic that the player hasn\'t discovered yet.',
+    inputSchema: {
+      type: 'object' as const,
+      properties: {
+        character_id: { type: 'string', description: 'Character doing the research' },
+        topic: { type: 'string', description: 'What to research (e.g., "Umbrella Corporation", "Arklay attacks")' },
+        location_id: { type: 'string', description: 'Where the research happens (optional, for context)' },
+        situational_modifier: { type: 'number', description: 'Bonus/penalty from circumstances' },
+      },
+      required: ['character_id', 'topic'],
+    },
+  },
+  {
+    name: 'move_to_location',
+    description: 'Move the player to a new location. Updates LOCATED_AT edge. Returns new location details and NPCs present.',
+    inputSchema: {
+      type: 'object' as const,
+      properties: {
+        character_id: { type: 'string', description: 'Character to move' },
+        location_id: { type: 'string', description: 'Destination location ID' },
+      },
+      required: ['character_id', 'location_id'],
+    },
+  },
+  {
+    name: 'advance_time',
+    description: 'Advance game time. Checks NPC agendas, pending consequences, and world reactions to player progress. Call between major scenes or at session boundaries.',
     inputSchema: {
       type: 'object' as const,
       properties: {},
@@ -391,6 +473,96 @@ export function createServer(store: WorldStore) {
         const doc = await store.getDocument();
         const result = findConflicts(doc);
         return text({ conflicts: result });
+      }
+
+      // ─── Narrative Tools ────────────────────────────────────────────
+
+      case 'log_event': {
+        if (!args.title) return text({ error: 'title is required' });
+        if (!args.description) return text({ error: 'description is required' });
+        if (!args.causal_type || !['therefore', 'but'].includes(args.causal_type as string)) {
+          return text({ error: 'causal_type must be "therefore" or "but"' });
+        }
+
+        const result = await logEvent(store, {
+          title: args.title as string,
+          description: args.description as string,
+          causal_type: args.causal_type as 'therefore' | 'but',
+          caused_by_event_id: args.caused_by_event_id as string | undefined,
+          participant_ids: args.participant_ids as string[] | undefined,
+          tags: args.tags as string[] | undefined,
+        });
+
+        return text({
+          event: result.event,
+          causal_edge: result.causal_edge,
+          witnessed_count: result.witnessed_edges.length,
+        });
+      }
+
+      case 'investigate': {
+        if (!args.character_id) return text({ error: 'character_id is required' });
+        if (!args.location_id) return text({ error: 'location_id is required' });
+
+        const result = await investigate(store, {
+          character_id: args.character_id as string,
+          location_id: args.location_id as string,
+          focus: args.focus as string | undefined,
+          situational_modifier: args.situational_modifier as number | undefined,
+        });
+
+        return text({
+          ...result,
+          clues_found: result.clues_found.map(c => ({
+            id: c.id, title: c.title, description: c.description, type: c.type,
+          })),
+        });
+      }
+
+      case 'interview_npc': {
+        if (!args.character_id) return text({ error: 'character_id is required' });
+        if (!args.npc_id) return text({ error: 'npc_id is required' });
+
+        const result = await interviewNpc(store, {
+          character_id: args.character_id as string,
+          npc_id: args.npc_id as string,
+          topic: args.topic as string | undefined,
+          approach: args.approach as 'friendly' | 'intimidating' | 'deceptive' | undefined,
+        });
+
+        return text(result);
+      }
+
+      case 'research': {
+        if (!args.character_id) return text({ error: 'character_id is required' });
+        if (!args.topic) return text({ error: 'topic is required' });
+
+        const result = await research(store, {
+          character_id: args.character_id as string,
+          topic: args.topic as string,
+          location_id: args.location_id as string | undefined,
+          situational_modifier: args.situational_modifier as number | undefined,
+        });
+
+        return text(result);
+      }
+
+      case 'move_to_location': {
+        if (!args.character_id) return text({ error: 'character_id is required' });
+        if (!args.location_id) return text({ error: 'location_id is required' });
+
+        const result = await moveToLocation(
+          store,
+          args.character_id as string,
+          args.location_id as string,
+        );
+
+        return text(result);
+      }
+
+      case 'advance_time': {
+        const result = await advanceTime(store);
+        return text(result);
       }
 
       default:
