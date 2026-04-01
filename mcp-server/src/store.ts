@@ -185,6 +185,19 @@ export class WorldStore {
     return doc.edges.filter(e => e.source === nodeId || e.target === nodeId);
   }
 
+  /** Update the player state in the world document (session count, act, beat). */
+  async updatePlayer(patch: Partial<WorldDocument['player']>): Promise<WorldDocument['player']> {
+    return this.withLock(async () => {
+      const doc = await this.read();
+      if (patch.character_id !== undefined) doc.player.character_id = patch.character_id;
+      if (patch.session_count !== undefined) doc.player.session_count = patch.session_count;
+      if (patch.current_act !== undefined) doc.player.current_act = patch.current_act;
+      if (patch.current_beat !== undefined) doc.player.current_beat = patch.current_beat;
+      await this.write(doc);
+      return doc.player;
+    });
+  }
+
   static findNode(doc: WorldDocument, id: string): GameNode | undefined {
     return doc.nodes.find(n => n.id === id);
   }
