@@ -1,0 +1,22 @@
+{
+  "name": "rpg-engine-mcp-server",
+  "version": "0.1.0",
+  "description": "MCP server for a graph-based RPG engine — the world is a graph",
+  "type": "module",
+  "bin": {
+    "rpg-engine-mcp-server": "dist/index.js"
+  },
+  "files": ["dist"],
+  "scripts": {
+    "build": "tsup src/index.ts --format esm --dts --clean --target node20",
+    "dev": "tsup src/index.ts --format esm --watch"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.27.0",
+    "nanoid": "^5.1.0"
+  },
+  "devDependencies": {
+    "tsup": "^8.5.1",
+    "typescript": "^5.8.0"
+  }
+}
