@@ -71,6 +71,13 @@ Phases 1-3 complete. 25 MCP tools. Onboarding v2.1 shipped. UPG product graph (1
 
 ## What's Next
 
+### Automated Playtesting (attempted, needs fix)
+- 5 persona test suite created (grunt, novelist, comedian, breaker, dm)
+- Runner script launched all 5 but they shared the same world.rpg — file contention
+- Fix needed: each persona needs its own sandbox directory with isolated game files
+- No reports collected yet — `-p` mode buffers output until completion, sessions were killed
+- Personas and report templates are ready, just need the isolation fix
+
 ### Phase 4: NPC Sub-Agents
 - Haiku agents for minor NPCs, Sonnet for key characters
 - Fed only backstory + voice guide + KNOWS edges
