@@ -210,6 +210,7 @@ export interface InterviewResult {
   npc_title: string;
   npc_opinion: number;
   information_shared: Array<{ id: string; title: string; type: string; detail?: string }>;
+  do_not_reference: Array<{ id: string; title: string }>;
   opinion_change: number;
   narrative_hint: string;
 }
@@ -328,6 +329,22 @@ export async function interviewNpc(
     }
   }
 
+  // Build exclusion list: things the PLAYER knows that this NPC does NOT know.
+  // This prevents the narrator from accidentally leaking player knowledge into NPC dialogue.
+  const npcKnowsIds = new Set(
+    doc.edges.filter(e => (e.type === 'knows' || e.type === 'suspects') && e.source === params.npc_id).map(e => e.target)
+  );
+  const playerKnowsIds = doc.edges
+    .filter(e => (e.type === 'knows' || e.type === 'suspects') && e.source === params.character_id)
+    .map(e => e.target);
+  const do_not_reference = playerKnowsIds
+    .filter(id => !npcKnowsIds.has(id))
+    .map(id => {
+      const node = doc.nodes.find(n => n.id === id);
+      return node ? { id: node.id, title: node.title } : null;
+    })
+    .filter((item): item is NonNullable<typeof item> => item !== null);
+
   // Update NPC opinion via remove + re-add
   if (opinion_change !== 0 && opinionEdge) {
     const newWeight = Math.max(-100, Math.min(100, npc_opinion + opinion_change));
@@ -347,6 +364,7 @@ export async function interviewNpc(
     npc_title: npc.title,
     npc_opinion: npc_opinion + opinion_change,
     information_shared,
+    do_not_reference,
     opinion_change,
     narrative_hint,
   };

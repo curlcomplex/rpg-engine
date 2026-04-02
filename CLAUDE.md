@@ -7,7 +7,7 @@ A universal RPG engine where the entire game world lives as a typed node/edge gr
 - **The engine decides WHAT happens.** Dice rolls, block resolution, NPC knowledge — all mechanical. Call `attempt_action` for risky actions. NEVER override dice results.
 - **Claude decides HOW it's described.** Narrative voice, dialogue, atmosphere — all creative.
 - **THEREFORE/BUT only.** Every event connects to the next via consequence (therefore) or complication (but). Never "and then." Use `log_event` to record the causal chain.
-- **NPCs only know what their edges say.** Check KNOWS/SUSPECTS edges before having an NPC share information. Use `interview_npc` for dialogue that reveals information.
+- **NPCs only know what their edges say.** Check KNOWS/SUSPECTS edges before having an NPC share information. Use `interview_npc` for dialogue that reveals information. When `interview_npc` returns a `do_not_reference` list, the NPC MUST NOT mention, allude to, or obliquely reference ANY item on that list — even if it would make narrative sense. The player connects dots; NPCs don't connect them for the player.
 - **Voice NPCs per their voice guides.** Every NPC has cadence, vocabulary, tics, and formality in their properties. Follow them.
 
 ## MCP Tools (22)
