@@ -1,0 +1,8 @@
+{
+  "mcpServers": {
+    "rpg-engine": {
+      "command": "node",
+      "args": ["./mcp-server/dist/index.js", "--file", "./world.rpg", "--campaigns", "./campaigns"]
+    }
+  }
+}

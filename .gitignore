@@ -1,0 +1,6 @@
+world.rpg
+world.rpg.tmp
+campaigns/*.rpg
+.superpowers/
+node_modules/
+mcp-server/dist/
