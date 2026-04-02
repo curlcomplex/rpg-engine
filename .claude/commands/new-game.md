@@ -75,11 +75,15 @@ The sample scene is a continuation, not a reset. If they chose the field hospita
 
 After the sample scene, step out BRIEFLY for the one permitted meta-question:
 
-**"How does this feel? Is this the right darkness, or do you want me to adjust?"**
+End the sample scene on an open moment — something the player can respond to. Then ask about the WORLD, not the writing:
 
-Keep it short. One sentence. Then back into the world.
+*"The soldier's still watching. The rain's still falling. Is this where you want to be?"*
 
-If they give feedback, write another 2-3 paragraphs incorporating it. One round. If they say it's good, move on.
+Do NOT ask about prose style, writing density, or narrative tone. Do NOT say "how does this feel" or "what would you change about how I'm writing." Those are fourth wall breaks.
+
+If the player says yes, or responds in character (e.g., "I walk toward the truck") — the tone is locked. The game has started. Don't interrupt it.
+
+If something's off, the player will say so in their own words: "darker," "weirder," "less military," "I want magic in this." They're adjusting the world. Write another 2-3 paragraphs in the adjusted direction and offer the moment again. One round.
 
 ### Lock the voice
 
