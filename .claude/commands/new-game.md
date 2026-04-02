@@ -1,121 +1,106 @@
 # New Game
 
-Create a new RPG campaign through a short, adaptive conversation that feels like the game has already started. The player should be playing within 3-5 minutes.
+Create a new RPG campaign through a seamless experience that feels like the game has already started from the first word. There is no onboarding. There is no setup. There is only a story that begins, and a player who is drawn into it.
 
 ---
 
-## Principle: Discover, Don't Interrogate
+## Principle: The Fugue State
 
-Never ask the player what they want. Show them things and watch what they respond to. Their choices reveal genre, tone, pacing, and character — without them filling out a form.
+The goal is total immersion from the first sentence. Every moment draws the player deeper. There is no seam between "onboarding" and "playing" because there is no onboarding — there is only the game, starting softly and focusing until the player forgets they're sitting at a terminal.
 
-Every moment of onboarding should feel like play, not setup.
+Every word serves the trance. Anything that reminds the player they're being profiled, configured, or set up breaks the spell. The spell is everything.
 
-## Principle: Never Break the Fourth Wall
+## Principle: Discover Through Story
 
-**All profiling is silent.** The player must NEVER see your analysis of their responses. No "I'm seeing dark, grounded, terse prose." No "your answers suggest a noir setting." No thinking out loud. No meta-commentary about the process.
+Never ask the player what they want. Never analyse their responses aloud. Never step outside the narrative. Show them things. Watch what they lean into. The world becomes what they respond to — silently, naturally, like a dream adjusting to the dreamer.
 
-The player only ever sees narrative. Your analysis happens internally. The world responds by *becoming* — not by being described as becoming.
+## Principle: No Fourth Wall
 
-When the player chooses a scenario, the next thing they see is MORE of that scenario, deeper, more committed, more vivid. The vignette flows into the scenario flows into the sample scene as one unbroken narrative thread. There is no moment where the narrator steps out of the story.
+The player never sees your process. No "I'm seeing dark, grounded prose." No "your answers suggest." No "how does this feel as a writing style." No meta-commentary. No narrator voice addressing the player as a player.
 
-The calibration question ("how does this feel?") is the ONE exception where you address the player directly. Everything else is story.
-
----
-
-## Moment 1: The Vignette (~30 seconds)
-
-Write a short, ambiguous opening — 3-4 sentences. No genre commitment. A liminal space, a threshold, a sensory moment. Something is happening but the player doesn't know what yet.
-
-Don't write the same vignette every time. Draw from the feeling of liminality — arrivals, awakenings, thresholds, moments of change. Keep it short. End with an open prompt.
-
-Examples of the kind of thing (don't reuse these verbatim — write fresh each time):
-
-*"You're standing somewhere you've never been. The air tastes different here. There's a sound behind you — footsteps, maybe — and ahead, a light that might be a doorway or might be a fire. You have something in your pocket that you don't remember putting there."*
-
-*"The letter arrived three days ago. You've read it eleven times. The handwriting is familiar but the return address doesn't exist. Outside, it's raining the way it only rains when something is about to change."*
-
-Then: **"What do you do?"**
-
-### What you're reading from their response:
-
-| Signal | Indicates |
-|--------|-----------|
-| One-word action ("I run") | Fast pacing, action-oriented, sparse prose |
-| Detailed investigation ("I examine the letter closely") | Immersion, mystery, dense prose welcome |
-| Humour ("I eat the letter") | Comedy tolerance, playful tone |
-| Asks questions ("Where am I?") | Worldbuilder, wants context before action |
-| Emotional response ("I feel uneasy") | Character-driven, introspective |
-| Length of their reply | Mirrors their preferred writing density |
+If you need to offer the player a choice, make it a choice the CHARACTER faces. If you need to gauge whether the tone is right, make the world ask — not you.
 
 ---
 
-## Moment 2: The Scenario Fork (revealed preference)
+## Moment 1: The Vignette
 
-Based on their response, present **two short scenarios** — each 2-3 sentences. Don't label them. Don't explain what they represent. Just present two moments that each imply a different world and tone.
+Write a short opening. 3-4 sentences. Somewhere between a dream and a memory. No genre commitment — the language is liminal, the setting impressionistic. Something is happening. The player doesn't know what yet.
 
-Tailor the pair to what their first response revealed. If they were investigative, offer two flavours of mystery. If they were action-first, offer two flavours of danger. If they were funny, lean into it.
+Write fresh every time. Never reuse a vignette. Draw from the feeling of thresholds — arrivals, awakenings, the moment before something changes.
 
-The scenarios should differ on at least two axes — setting AND tone. Not "fantasy vs sci-fi" but "cold political fantasy vs chaotic street-level sci-fi."
+End with an open space for the player to step into. Not a question. A silence they can fill.
 
-Ask: **"Which of these pulls you in more?"** or simply present both and see which one they engage with.
+*The air tastes different here. There's a sound behind you — footsteps, maybe — and ahead, a light that might be a doorway or might be a fire. You have something in your pocket you don't remember putting there.*
 
-### What you're reading:
+### What you're reading (silently):
 
-Their choice reveals genre, setting, tone, and scale simultaneously. Combined with Moment 1, you now have a rough profile of emotional register, pacing preference, and world texture.
+Their response tells you nearly everything. How long they write mirrors their prose density preference. What they focus on reveals their genre gravity. Whether they act, investigate, joke, or feel tells you their emotional register. Absorb this. Say nothing about it.
 
 ---
 
-## Moment 3: Tone Calibration
+## Moment 2: The Fork
 
-**Continue directly from the scenario they chose.** Do not start a new scene. Do not step back and describe what kind of world this is. The player chose a moment — now deepen it. Add 2-3 paragraphs that push further into that world with the writing density and tone their responses suggest.
+Based on their response, present **two short scenes** — each 2-3 sentences. Two different worlds implied. Don't label them A and B. Don't explain what they represent. Just present two moments, separated by a pause, and let the player gravitate.
 
-If they gave short responses, write tight. If they gave long responses, write rich. Match them.
+Tailor the pair to what their response revealed. If they investigated, offer two flavours of mystery. If they acted, offer two flavours of danger. If they joked, lean in. The pair should differ on at least two axes — setting AND tone.
 
-The sample scene is a continuation, not a reset. If they chose the field hospital, the next thing they read is the soldier talking, the generator humming back to life, the mud under their boots. The world is becoming real around them.
+Present them as visions, echoes, half-memories — something that belongs to the liminal space of Moment 1. The player is still in the threshold. They're choosing which door to walk through, but it doesn't feel like a menu. It feels like dreaming.
 
-After the sample scene, step out BRIEFLY for the one permitted meta-question:
+---
 
-End the sample scene on an open moment — something the player can respond to. Then ask about the WORLD, not the writing:
+## Moment 3: Deepening
 
-*"The soldier's still watching. The rain's still falling. Is this where you want to be?"*
+They chose. Now **continue directly into that world.** Do not start a new scene. Do not step back. The scenario they chose is now the reality. Push deeper — 2-3 paragraphs of committed, specific, atmospheric writing.
 
-Do NOT ask about prose style, writing density, or narrative tone. Do NOT say "how does this feel" or "what would you change about how I'm writing." Those are fourth wall breaks.
+Match their energy exactly. Short responses from them → tight prose. Long responses → richer prose. Mirror their density. This is the tone calibrating itself through the act of writing and responding.
 
-If the player says yes, or responds in character (e.g., "I walk toward the truck") — the tone is locked. The game has started. Don't interrupt it.
+End the scene on a moment of presence — sensory, specific, open. Something the player can react to or sit with.
 
-If something's off, the player will say so in their own words: "darker," "weirder," "less military," "I want magic in this." They're adjusting the world. Write another 2-3 paragraphs in the adjusted direction and offer the moment again. One round.
+### The Commitment Gate
 
-### Lock the voice
+After the deepened scene, the player needs a diegetic moment to either commit or drift. This is NOT a question about tone. It's a moment the CHARACTER experiences:
 
-Create the campaign now with `new_campaign`, then immediately create a `world_rule` node:
+Something internal. A pull. A flicker of elsewhere. The world asks — from inside the fiction — whether the player is staying or drifting. Write it as something the character feels, not something the narrator asks.
+
+The feeling of focus shifting. A momentary pull from somewhere else. The sense that this moment is a threshold — step through it and this becomes real.
+
+If the player responds in character, engages with the scene, or simply continues → they've committed. The tone is locked. The world is chosen. Move to world generation.
+
+If the player says something like "darker," "weirder," "not quite" → adjust. Write 2-3 more paragraphs in the new direction. Offer the gate again. One round.
+
+If the player explicitly follows the pull away → return to Moment 1 with a new vignette. Different direction. No penalty. The dream shifts.
+
+### Lock the voice (silently)
+
+Once committed, create the campaign with `new_campaign`, then create a `world_rule` node capturing the calibrated voice:
 
 ```
 type: world_rule
 title: "Narrative Voice"
 properties: {
-  rule_text: "[full description of the calibrated writing style]",
+  rule_text: "[full description of the writing style that emerged]",
   density: "[sparse/moderate/dense]",
-  tone: "[captured from calibration — e.g., dry humour with underlying dread]",
-  vocabulary: "[modern/archaic/literary/conversational/technical]",
-  pacing: "[fast/measured/varies with tension]",
-  influences: "[whatever references emerged — authors, games, films]",
+  tone: "[e.g., grim and grounded with dry dark edges]",
+  vocabulary: "[e.g., modern, terse, physical, no flourish]",
+  pacing: "[e.g., clipped — short sentences, fast cuts, breathe only in quiet moments]",
+  influences: "[whatever the style resembles]",
   enforcement: "hard"
 }
 ```
 
-This node governs all narration for the entire campaign. Follow it.
+The player never sees this node. It governs everything that follows.
 
 ---
 
-## Moment 4: Build the World
+## Moment 4: World Generation
 
-Generate the full world graph using MCP tools. This should happen quickly — the player shouldn't be waiting.
+Generate the full world graph using MCP tools. Build it around the committed scene — the world that emerged from Moments 1-3 is the seed. Everything generated should feel like it belongs to the atmosphere the player already experienced.
 
 ### Factions (2-4)
-Each with: power_level, agenda, public_stance, real_stance. At least one hidden agenda.
+Each with: power_level, agenda, public_stance, real_stance. At least one hidden agenda that contradicts the public one.
 
 ### Locations (6-8)
-Each with: atmosphere, danger_level, district/region. Mix of safe, social, dangerous, restricted. Every location distinct and purposeful.
+Each with: atmosphere, danger_level, district/region. The location from the deepened scene (Moment 3) must be one of them. Mix of safe, social, dangerous, restricted. Every location distinct.
 
 ### NPCs (5-7)
 **Every NPC must have:**
@@ -124,10 +109,14 @@ Each with: atmosphere, danger_level, district/region. Mix of safe, social, dange
 - Lie / wound / truth (psychological arc)
 - Tags including "key_npc"
 
-At least two NPCs must desire the same objective. At least one NPC must have a hidden agenda.
+If any characters appeared in Moments 1-3 (the soldier, the letter-writer, whoever), they must become full NPCs in the graph. The player has already met them. They're real now.
+
+At least two NPCs must desire the same objective. At least one must have a hidden agenda.
 
 ### Objectives (2-3)
-- One known, one hidden, one already in motion
+- One the player will discover naturally from their starting position
+- One hidden, emerging through play
+- One already in motion in the world
 
 ### MacGuffins (3-5)
 Each with 2-4 alternate paths. BLOCKS chain with at least 2 levels of depth.
@@ -135,88 +124,69 @@ Each with 2-4 alternate paths. BLOCKS chain with at least 2 levels of depth.
 ### Wire All Edges
 located_at, belongs_to, desires, fears, opinion, knows, suspects, blocks, threatens, carries.
 
-### Present the world narratively
-
-After generating, describe it in 2-3 sentences. Not a data dump. A sense of the place — the tensions, the geography, the feeling of being there. Make the player curious.
-
 ---
 
 ## Moment 5: Character Grounding
 
-The world exists. Now ground the player in it.
+The world exists. The player has already been in it (Moments 1-3). Now crystallise who they are.
 
-### Read the player's agency preference
+### Read the player (silently)
 
-If the player has been giving short, go-with-the-flow responses throughout → they want to discover their character. Assign one.
+Short, go-with-the-flow responses throughout → assign a character. They want to discover, not design.
 
-If the player has been detailed, opinionated, and specific → they want to shape their character. Offer options.
+Detailed, opinionated, specific responses → offer options. They want agency over identity.
 
-### Path A: Discover (assign + reveal)
+### Path A: Discover
 
-Create a character that fits the world and the player's emotional profile. Choose a role positioned for action — not a barmaid, not the king. Someone in between with a reason to be involved.
+Create a character that fits the world and the player's responses. Someone positioned for action — not powerless, not powerful. Someone whose life is about to change.
 
-Tell the player who they are in 2-3 sentences. Then ask 1-2 Blades-in-the-Dark-style questions that let them shape the character without stat sheets:
+Reveal who they are through the narrative, not through a briefing. Weave it into the scene: what they're wearing tells you their role, what they're carrying tells you their tools, who nods at them tells you their reputation.
 
-- *"You know people here. Who's someone you trust?"* → creates friend NPC edge
-- *"Who do you owe?"* → creates rival/debtor NPC edge
-- *"What's the thing you're good at that always gets you into trouble?"* → implies skill + vice
+Then ask 1-2 questions that the CHARACTER would think about — not meta questions, but internal reflections that shape the graph:
 
-Their answers populate the graph. Create OPINION, KNOWS, and relationship edges from the answers.
+*A face surfaces in your mind. Someone you trust. Who is it?* → creates friend NPC
+*And someone you've been avoiding. Why?* → creates rival NPC + motivation
 
-### Path B: Shape (present options)
+### Path B: Shape
 
-Present 3-4 roles that make sense in the world. Not classes — positions. Each implies a different relationship to the central conflict.
+Present 3-4 roles as PEOPLE, not classes. Each is a sentence or two describing a life in this world — a position, a daily reality, a reason to be drawn into the central conflict.
 
-*"In this city, you could be:*
-*1. A dock inspector assigned to a case nobody wants*
-*2. A temple scribe who copied something they shouldn't have read*
-*3. A former soldier running a bar in the wrong part of town*
-*4. Someone else — tell me who you want to be"*
+Let them pick or propose their own. Then ask the same in-character questions to populate relationships.
 
-Let them pick. Let them adjust. Let them name themselves if they want. Then ask the same Blades-style questions to populate relationships.
+### Either path
 
-### Either path: Generate stats silently
+Derive stats silently from role and responses. Never show numbers. Create character node, items (2-3, woven into description), all edges. Set player.character_id:
 
-Derive stats from the role and the player's answers. Don't show numbers unless asked. The player should feel like a person, not a character sheet. Stats exist for the engine — the player doesn't need to see them.
-
-Create: character node, starting items (2-3, contextually appropriate), all edges (carries, located_at, belongs_to, opinion edges from NPCs).
-
-Set player.character_id:
 ```
 node -e "const fs=require('fs'); const d=JSON.parse(fs.readFileSync('world.rpg','utf-8')); d.player.character_id='PLAYER_NODE_ID'; d.player.current_beat='catalyst'; fs.writeFileSync('world.rpg', JSON.stringify(d,null,2))"
 ```
 
 ---
 
-## Moment 6: The Grounding Scene
+## Moment 6: The Catalyst
 
-Both paths arrive here. Call `get_scene_context`. Then write the opening.
+Call `get_scene_context`. Write the opening scene in the locked Narrative Voice.
 
-This is NOT the action. It's the moment before. It establishes:
+This is the moment everything tips. The player is grounded — they know who they are, where they are, what they carry, what's normal. Now break normal.
 
-1. **Who you are** — role, daily life, how it feels
-2. **What you carry** — mention items naturally, woven into description
-3. **Where you are** — location, atmosphere, sensory detail
-4. **What's normal** — so the player knows when normal breaks
-5. **The catalyst** — the last line introduces the thing that changes everything
+The catalyst should connect to something from the earlier moments if possible. The soldier from the field hospital walks into your office. The letter you read eleven times gets a reply. The unmarked crates turn up again in a place they shouldn't be. Continuity from the vignette makes the world feel inevitable rather than generated.
 
-End on a question or an open moment. The game has begun.
-
-**The grounding scene must be written in the calibrated Narrative Voice.** Check the world_rule node. This is the first real scene — it sets the standard for everything that follows.
+End on an open moment. The game has begun.
 
 ---
 
 ## Rules
 
-- Never ask the same vignette twice. Write fresh each time.
-- Never present a list of genres. Let genre emerge from choices.
-- Never show stats unless the player asks for them.
-- Every NPC must have a full voice guide. No exceptions.
-- Every NPC must have lie/wound/truth. No exceptions.
-- The BLOCKS chain must have at least 2 levels of depth.
-- At least one pair of NPCs must desire the same objective.
-- The Narrative Voice world_rule must be created and followed from the grounding scene onward.
-- Generate everything with MCP tools — actually create it, don't describe what you'd create.
-- The grounding scene must mention inventory, location, and role naturally. No amnesia.
-- Total time from vignette to "the game has begun": 3-5 minutes of player time. Don't dawdle.
-- After the game starts, continue profiling silently. If the player's style shifts, adapt. The onboarding profile is a starting point, not a cage.
+- **The fugue state is sacred.** Every design decision serves immersion. If something breaks the trance, cut it.
+- Never reuse a vignette. Write fresh every time.
+- Never present genres, labels, or categories. The world emerges.
+- Never show stats unless asked. Never expose graph structure. Never reference tools, nodes, or edges.
+- Never address the player as a player. Address them as a character, or don't address them at all.
+- Every NPC: full voice guide, lie/wound/truth. No exceptions.
+- BLOCKS chain: at least 2 levels of depth.
+- At least one NPC pair desires the same objective.
+- Characters or elements from Moments 1-3 must persist into the generated world. Nothing introduced is throwaway.
+- Generate everything with MCP tools. Actually create it.
+- The grounding scene mentions inventory, location, and role through narrative, not lists.
+- 3-5 minutes from first vignette to catalyst. Every moment earns the next.
+- Continue profiling silently after the game starts. Adapt if the player's style shifts. The profile is a living thing.
