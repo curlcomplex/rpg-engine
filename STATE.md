@@ -4,7 +4,7 @@
 2026-04-03
 
 ## Current Status
-Phase 1 and Phase 2 complete. Onboarding v2.1 shipped. UPG product graph set up. Three active playthroughs in progress.
+Phases 1-3 complete. 25 MCP tools. Onboarding v2.1 shipped. UPG product graph (108 nodes). Three active playthroughs in progress.
 
 ## What's Been Built
 
@@ -16,6 +16,12 @@ Phase 1 and Phase 2 complete. Onboarding v2.1 shipped. UPG product graph set up.
 - Cascade queries: trace_blocks, detect_neglect, find_conflicts
 - get_scene_context for narrator context loading
 - 13 initial tools
+
+### Phase 3: Drama Manager (complete)
+- check_narrative_health — therefore/but ratio, causal chain length, orphan events, tension trend, diagnosis with recommendations
+- get_npc_agendas — what every NPC wants, fears, knows, where they are, what blocks their goals
+- get_available_storylets — quality-based narrative, storylets whose requirements the player has met
+- 25 total tools
 
 ### Phase 2: Narrative Tools (complete)
 - log_event with THEREFORE/BUT enforcement
@@ -64,12 +70,6 @@ Phase 1 and Phase 2 complete. Onboarding v2.1 shipped. UPG product graph set up.
 7. Revealed over stated preferences — research-backed
 
 ## What's Next
-
-### Phase 3: Drama Manager
-- check_narrative_health (tension curves, therefore/but validation)
-- get_npc_agendas (what NPCs are independently pursuing)
-- get_available_storylets (quality-based narrative, content unlocked by player state)
-- Tension tracking system
 
 ### Phase 4: NPC Sub-Agents
 - Haiku agents for minor NPCs, Sonnet for key characters

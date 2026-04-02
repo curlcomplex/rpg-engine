@@ -9,7 +9,10 @@ import {
 } from './types.js';
 import type { NodeType, EdgeType } from './types.js';
 import { resolveAction } from './dice.js';
-import { traceBlocks, detectNeglect, findConflicts, getSceneContext } from './queries.js';
+import {
+  traceBlocks, detectNeglect, findConflicts, getSceneContext,
+  checkNarrativeHealth, getNpcAgendas, getAvailableStorylets,
+} from './queries.js';
 import { promises as fs } from 'node:fs';
 import { resolve, basename } from 'node:path';
 import {
@@ -294,6 +297,31 @@ const TOOLS = [
         name: { type: 'string', description: 'Campaign name (filename without .rpg extension)' },
       },
       required: ['name'],
+    },
+  },
+  // ─── Drama Manager ───────────────────────────────────────────────
+  {
+    name: 'check_narrative_health',
+    description: 'Analyse narrative health: therefore/but balance, causal chain integrity, tension trends, neglected plotlines, orphan events, unresolved threats. Returns diagnosis with specific recommendations. Call between scenes or when the story feels flat.',
+    inputSchema: {
+      type: 'object' as const,
+      properties: {},
+    },
+  },
+  {
+    name: 'get_npc_agendas',
+    description: 'Get what every active NPC is pursuing, afraid of, knows, and where they are. The drama manager\'s view — what\'s in motion independent of the player. Use to decide NPC actions during advance_time or when the player enters a new location.',
+    inputSchema: {
+      type: 'object' as const,
+      properties: {},
+    },
+  },
+  {
+    name: 'get_available_storylets',
+    description: 'Find storylets whose requirements are satisfied by the player\'s current knowledge and inventory. Quality-based narrative — content surfaces when the player is ready. Use to discover what narrative beats are available right now.',
+    inputSchema: {
+      type: 'object' as const,
+      properties: {},
     },
   },
 ];
@@ -600,6 +628,26 @@ export function createServer(store: WorldStore) {
       case 'advance_time': {
         const result = await advanceTime(store);
         return text(result);
+      }
+
+      // ─── Drama Manager ──────────────────────────────────────────────
+
+      case 'check_narrative_health': {
+        const doc = await store.getDocument();
+        const result = checkNarrativeHealth(doc);
+        return text(result);
+      }
+
+      case 'get_npc_agendas': {
+        const doc = await store.getDocument();
+        const result = getNpcAgendas(doc);
+        return text({ npcs: result });
+      }
+
+      case 'get_available_storylets': {
+        const doc = await store.getDocument();
+        const result = getAvailableStorylets(doc);
+        return text({ available: result, count: result.length });
       }
 
       // ─── Campaign Management ────────────────────────────────────────
