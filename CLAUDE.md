@@ -39,12 +39,13 @@ The file `rpg-engine.upg` is a product graph that tracks every feature, bug, ide
 ## MCP Servers
 
 ### rpg-engine (Game Engine)
-22 tools for gameplay:
+25 tools for gameplay:
 - CRUD: `create_node`, `get_node`, `update_node`, `delete_node`, `list_nodes`, `search_nodes`
 - Edges: `create_edge`, `delete_edge`
 - Mechanics: `attempt_action`
 - Context: `get_scene_context`
 - Queries: `trace_blocks`, `detect_neglect`, `find_conflicts`
+- Drama Manager: `check_narrative_health`, `get_npc_agendas`, `get_available_storylets`
 - Narrative: `log_event`, `investigate`, `interview_npc`, `research`, `move_to_location`, `advance_time`
 - Campaigns: `list_campaigns`, `new_campaign`, `load_campaign`
 
