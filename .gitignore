@@ -1,6 +1,9 @@
 world.rpg
 world.rpg.tmp
 campaigns/*.rpg
+*.upg
+packages/*/node_modules/
+packages/*/dist/
 .superpowers/
 node_modules/
 mcp-server/dist/

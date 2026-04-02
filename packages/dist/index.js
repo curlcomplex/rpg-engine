@@ -1,0 +1,742 @@
+/**
+ * @upg/core — Unified Product Graph Specification
+ *
+ * The open specification and TypeScript SDK for product knowledge graphs.
+ *
+ * https://unifiedproductgraph.org
+ * License: MIT
+ */
+import { UPG_DOMAINS, getTypesForTier } from './domains.js';
+import { UPG_ENTITY_META } from './entity-meta.js';
+export * from './types.js';
+export * from './schema.js';
+export * from './domains.js';
+export * from './properties/index.js';
+export * from './frameworks.js';
+export * from './entity-meta.js';
+export * from './migrations.js';
+export * from './type-labels.js';
+export * from './lenses.js';
+export * from './benchmarks.js';
+export { validateUPGDocument, isUPGDocument } from './validate.js';
+/** The current spec version implemented by this package */
+export const UPG_VERSION = '0.1.0';
+// ─── All entity types (computed from domain registry) ───────────────────────────
+/**
+ * Every entity type in the UPG specification.
+ * Computed from the domain registry so it never drifts.
+ *
+ * Use this to check whether a type is a valid UPG type at runtime:
+ * ```ts
+ * const isValid = UPG_ALL_TYPES.includes(myType)
+ * ```
+ */
+export const UPG_ALL_TYPES = getTypesForTier('extended');
+/** Set of all valid UPG entity types — O(1) lookup for validation and filtering */
+export const UPG_ALL_TYPES_SET = new Set(UPG_ALL_TYPES);
+/**
+ * Human-readable labels for every UPG entity type.
+ * Converts snake_case to Title Case (e.g. 'user_story' -> 'User Story').
+ * Computed from the domain registry.
+ */
+export const UPG_ALL_TYPE_LABELS = Object.fromEntries(UPG_ALL_TYPES.map((t) => [
+    t,
+    t
+        .split('_')
+        .map((w) => {
+        // Handle known abbreviations
+        if (['kpi', 'jtbd', 'okr', 'sli', 'slo', 'sla', 'api', 'ci', 'ip', 'qa', 'ai', 'ml', 'ab', 'bm', 'nps', 'seo', 'gtm'].includes(w))
+            return w.toUpperCase();
+        if (w === 'a11y')
+            return 'A11y';
+        return w.charAt(0).toUpperCase() + w.slice(1);
+    })
+        .join(' '),
+]));
+// ─── Types with property interfaces ─────────────────────────────────────────
+/**
+ * UPG types that have full typed property interfaces (e.g. PersonaProperties).
+ * These are the types with dedicated property schemas in `types.ts`.
+ * For all types, use UPG_ALL_TYPES.
+ */
+export const UPG_TYPED_ENTITIES = [
+    'product',
+    'outcome',
+    'kpi',
+    'objective',
+    'key_result',
+    'persona',
+    'jtbd',
+    'need',
+    'opportunity',
+    'solution',
+    'hypothesis',
+    'experiment',
+    'learning',
+    'competitor',
+    'feature',
+    'epic',
+    'user_story',
+    'release',
+    'research_study',
+    'insight',
+    'metric',
+];
+/** @deprecated Use UPG_TYPED_ENTITIES instead */
+export const UPG_CORE_TYPES = UPG_TYPED_ENTITIES;
+/** All UPG edge types from the core schema */
+export const UPG_CORE_EDGE_TYPES = [
+    'product_has_outcome',
+    'product_has_objective',
+    'product_has_competitor',
+    'product_has_feature',
+    'product_has_release',
+    'product_has_research_study',
+    'product_has_persona',
+    'outcome_has_kpi',
+    'outcome_has_opportunity',
+    'objective_has_key_result',
+    'persona_has_jtbd',
+    'jtbd_has_need',
+    'opportunity_has_solution',
+    'solution_has_hypothesis',
+    'hypothesis_has_experiment',
+    'experiment_produces_learning',
+    'feature_has_epic',
+    'epic_has_user_story',
+    'cluster_has_insight',
+    'study_has_insight',
+    'insight_informs_opportunity',
+    // Opportunity as bridge — bundles user evidence
+    'opportunity_addresses_need',
+    'opportunity_pursues_outcome',
+    'opportunity_relates_to_job',
+];
+// ─── Labels ─────────────────────────────────────────────────────────────────────
+/**
+ * Human-readable labels for UPG entity types with property interfaces.
+ * Useful for building UI elements like entity pickers.
+ */
+export const UPG_CORE_TYPE_LABELS = {
+    product: 'Product',
+    outcome: 'Outcome',
+    kpi: 'KPI',
+    objective: 'Objective',
+    key_result: 'Key Result',
+    persona: 'Persona',
+    jtbd: 'Job-to-be-Done',
+    need: 'Need',
+    opportunity: 'Opportunity',
+    solution: 'Solution',
+    hypothesis: 'Hypothesis',
+    experiment: 'Experiment',
+    learning: 'Learning',
+    competitor: 'Competitor',
+    feature: 'Feature',
+    epic: 'Epic',
+    user_story: 'User Story',
+    release: 'Release',
+    research_study: 'Research Study',
+    insight: 'Insight',
+    metric: 'Metric',
+};
+// ─── Lifecycle groups ───────────────────────────────────────────────────────────
+/**
+ * Groups UPG types by the product creation lifecycle phase they belong to.
+ */
+export const UPG_CORE_TYPE_GROUPS = {
+    strategy: ['product', 'outcome', 'kpi', 'objective', 'key_result', 'metric'],
+    users: ['persona', 'jtbd', 'need'],
+    discovery: ['opportunity'],
+    validation: ['solution', 'hypothesis', 'experiment', 'learning'],
+    execution: ['feature', 'epic', 'user_story', 'release'],
+    market: ['competitor'],
+    research: ['research_study', 'insight'],
+};
+// ─── Computed counts ────────────────────────────────────────────────────────────
+// Derived from the actual arrays/registry — never hardcode these numbers elsewhere.
+/** Total entity types — computed from the domain registry */
+export const UPG_ENTITY_COUNT = UPG_DOMAINS.flatMap(d => d.types).length;
+/** @deprecated Use UPG_ENTITY_COUNT instead */
+export const UPG_TOTAL_ENTITY_COUNT = UPG_ENTITY_COUNT;
+/** Total number of domains — computed from the domain registry */
+export const UPG_DOMAIN_COUNT = UPG_DOMAINS.length;
+/** Number of entity types with full property interfaces */
+export const UPG_TYPED_CORE_COUNT = UPG_TYPED_ENTITIES.length;
+/** Number of active (non-deprecated) entity types — the count to show publicly */
+export const UPG_ACTIVE_ENTITY_COUNT = UPG_ENTITY_META
+    .filter(m => m.maturity === 'stable' || m.maturity === 'proposed')
+    .length;
+/** Number of deprecated entity types */
+export const UPG_DEPRECATED_ENTITY_COUNT = UPG_ENTITY_META
+    .filter(m => m.maturity === 'deprecated')
+    .length;
+// ─── Backwards-compatible aliases ──────────────────────────────────────────────
+const _coreDomains = UPG_DOMAINS.filter(d => d.tier === 'core');
+const _extendedOnlyDomains = UPG_DOMAINS.filter(d => d.tier === 'extended');
+/** @deprecated Use UPG_ENTITY_COUNT instead */
+export const UPG_CORE_ENTITY_COUNT = _coreDomains.flatMap(d => d.types).length;
+/** @deprecated Use UPG_ENTITY_COUNT instead */
+export const UPG_EXTENDED_ENTITY_COUNT = _extendedOnlyDomains.flatMap(d => d.types).length;
+/** @deprecated Use UPG_DOMAIN_COUNT instead */
+export const UPG_CORE_DOMAIN_COUNT = _coreDomains.length;
+/** @deprecated Use UPG_DOMAIN_COUNT instead */
+export const UPG_EXTENDED_DOMAIN_COUNT = _extendedOnlyDomains.length;
+// ─── Extended edge type map (full relationship vocabulary) ────────────────────
+/**
+ * Extended edge type lookup map.
+ * Key format: 'sourceType:targetType' -> canonical edge type string.
+ * Covers all domain-specific relationships beyond the core schema edges.
+ */
+export const UPG_EXTENDED_EDGE_MAP = {
+    // ── Strategic hierarchy ─────────────────────────────────────────────────
+    'outcome:feature': 'outcome_has_feature',
+    'persona:need': 'persona_has_need',
+    'persona:user_need': 'persona_has_user_need',
+    'persona:switching_cost': 'persona_has_switching_cost',
+    'persona:pain_point': 'persona_has_pain_point',
+    'persona:desired_outcome': 'persona_has_desired_outcome',
+    'jtbd:need': 'jtbd_has_need',
+    'jtbd:desired_outcome': 'jtbd_has_desired_outcome',
+    'jtbd:job_step': 'jtbd_has_job_step',
+    'opportunity:design_concept': 'opportunity_has_design_concept',
+    'opportunity:feasibility_study': 'opportunity_has_feasibility_study',
+    'opportunity:design_sprint': 'opportunity_has_design_sprint',
+    'solution:prototype': 'solution_has_prototype',
+    'hypothesis:research_plan': 'hypothesis_has_research_plan',
+    'hypothesis:test_plan': 'hypothesis_has_test_plan',
+    'experiment:ab_test': 'experiment_has_ab_test',
+    'experiment:evidence': 'experiment_has_evidence',
+    'objective:north_star_metric': 'objective_has_north_star_metric',
+    'key_result:kpi': 'key_result_has_kpi',
+    'key_result:input_metric': 'key_result_has_input_metric',
+    'kpi:outcome': 'kpi_has_outcome',
+    'competitor:competitor_feature': 'competitor_has_feature',
+    'product:market_trend': 'product_has_market_trend',
+    // ── Strategic cascade ─────────────────────────────────────────────────────
+    'product:vision': 'product_has_vision',
+    'product:mission': 'product_has_mission',
+    'product:strategic_theme': 'product_has_strategic_theme',
+    'product:initiative': 'product_has_initiative',
+    'product:capability': 'product_has_capability',
+    'product:value_stream': 'product_has_value_stream',
+    'product:strategic_pillar': 'product_has_strategic_pillar',
+    'product:assumption': 'product_has_assumption',
+    'vision:mission': 'vision_has_mission',
+    'mission:strategic_pillar': 'mission_has_strategic_pillar',
+    'strategic_pillar:strategic_theme': 'strategic_pillar_has_strategic_theme',
+    'strategic_pillar:capability': 'strategic_pillar_has_capability',
+    'strategic_pillar:value_stream': 'strategic_pillar_has_value_stream',
+    'strategic_pillar:decision': 'strategic_pillar_has_decision',
+    'strategic_theme:initiative': 'strategic_theme_has_initiative',
+    'initiative:assumption': 'initiative_has_assumption',
+    // ── Market ────────────────────────────────────────────────────────────────
+    'product:market_segment': 'product_has_market_segment',
+    'product:competitive_analysis': 'product_has_competitive_analysis',
+    'competitive_analysis:competitor': 'competitive_analysis_has_competitor',
+    'competitive_analysis:market_trend': 'competitive_analysis_has_market_trend',
+    'competitive_analysis:market_segment': 'competitive_analysis_has_market_segment',
+    // ── UX Research ───────────────────────────────────────────────────────────
+    'research_study:participant': 'study_has_participant',
+    'research_study:observation': 'study_has_observation',
+    'research_study:affinity_cluster': 'study_has_affinity_cluster',
+    'research_study:research_question': 'study_has_research_question',
+    'research_study:interview_guide': 'study_has_interview_guide',
+    'research_study:finding': 'study_has_finding',
+    'research_study:survey_response': 'study_has_survey_response',
+    'observation:quote': 'observation_has_quote',
+    'observation:highlight': 'observation_has_highlight',
+    'affinity_cluster:research_insight': 'cluster_has_research_insight',
+    'affinity_cluster:finding': 'cluster_has_finding',
+    // ── Design ────────────────────────────────────────────────────────────────
+    'product:user_journey': 'product_has_user_journey',
+    'product:design_component': 'product_has_design_component',
+    'product:wireframe': 'product_has_wireframe',
+    'user_journey:journey_step': 'journey_has_step',
+    'research_insight:ux_insight': 'insight_has_ux_insight',
+    'research_insight:how_might_we': 'insight_inspires_hmw',
+    'ux_insight:how_might_we': 'ux_insight_inspires_hmw',
+    'need:how_might_we': 'need_has_hmw',
+    'pain_point:how_might_we': 'pain_point_has_hmw',
+    'how_might_we:design_concept': 'hmw_has_concept',
+    'design_concept:prototype': 'concept_has_prototype',
+    'design_concept:wireframe': 'design_concept_has_wireframe',
+    'design_component:design_token': 'component_has_token',
+    'design_component:design_pattern': 'component_has_design_pattern',
+    'design_component:design_guideline': 'component_has_design_guideline',
+    'design_component:interaction_spec': 'component_has_interaction_spec',
+    'prototype:annotation': 'prototype_has_annotation',
+    // ── Unified Context Layer (Design System) ─────────────────────────────────
+    'product:design_system': 'product_has_design_system',
+    'product:user_flow': 'product_has_user_flow',
+    'product:external_api': 'product_has_external_api',
+    'product:data_flow': 'product_has_data_flow',
+    'design_system:design_component': 'design_system_has_design_component',
+    'design_system:design_token': 'design_system_has_design_token',
+    'design_system:design_guideline': 'design_system_has_design_guideline',
+    'design_system:brand_identity': 'design_system_has_brand_identity',
+    'design_system:user_journey': 'design_system_has_user_journey',
+    'design_system:user_flow': 'design_system_has_user_flow',
+    'design_system:ux_insight': 'design_system_has_ux_insight',
+    'user_flow:screen': 'user_flow_has_screen',
+    'screen:screen_state': 'screen_has_screen_state',
+    // Information Architecture edges
+    'product:screen': 'product_has_screen',
+    'screen:screen': 'screen_has_screen',
+    'screen:design_component': 'screen_has_component',
+    'design_component:design_component': 'component_has_component',
+    'screen:feature': 'screen_uses_feature',
+    'screen:wireframe': 'screen_has_wireframe',
+    // ── Brand ─────────────────────────────────────────────────────────────────
+    'product:brand_identity': 'product_has_brand_identity',
+    'brand_identity:brand_colour': 'brand_has_colour',
+    'brand_identity:brand_typography': 'brand_has_typography',
+    'brand_identity:brand_asset': 'brand_identity_has_brand_asset',
+    'brand_identity:brand_voice': 'brand_has_voice',
+    // ── Product Specification ─────────────────────────────────────────────────
+    'product:roadmap': 'product_has_roadmap',
+    'product:theme': 'product_has_theme',
+    'feature:bug': 'feature_has_bug',
+    'user_story:acceptance_criterion': 'story_has_acceptance_criterion',
+    'user_story:task': 'story_has_task',
+    'roadmap:roadmap_item': 'roadmap_has_roadmap_item',
+    'roadmap:theme': 'roadmap_has_theme',
+    'roadmap:release': 'roadmap_has_release',
+    'theme:feature': 'theme_has_feature',
+    'release:changelog': 'release_has_changelog',
+    // ── Engineering ───────────────────────────────────────────────────────────
+    'product:bounded_context': 'product_has_bounded_context',
+    'product:architecture_decision': 'product_has_architecture_decision',
+    'product:code_repository': 'product_has_code_repository',
+    'product:integration_pattern': 'product_has_integration_pattern',
+    'bounded_context:service': 'context_has_service',
+    'bounded_context:domain_event': 'context_has_domain_event',
+    'bounded_context:architecture_decision': 'context_has_architecture_decision',
+    'bounded_context:data_model': 'bounded_context_has_data_model',
+    'bounded_context:aggregate': 'context_has_aggregate',
+    'bounded_context:read_model': 'context_has_read_model',
+    'bounded_context:code_repository': 'bounded_context_has_code_repository',
+    'bounded_context:integration_pattern': 'bounded_context_has_integration_pattern',
+    'bounded_context:external_api': 'bounded_context_has_external_api',
+    'bounded_context:data_flow': 'bounded_context_has_data_flow',
+    'service:api_contract': 'service_has_api_contract',
+    'service:technical_debt_item': 'service_has_technical_debt',
+    'service:feature_flag': 'service_has_feature_flag',
+    'service:deployment': 'service_has_deployment',
+    'service:api_endpoint': 'service_has_api_endpoint',
+    'service:database_schema': 'service_has_database_schema',
+    'service:queue_topic': 'service_has_queue_topic',
+    'service:build_artifact': 'service_has_build_artifact',
+    'service:library_dependency': 'service_has_library_dependency',
+    'architecture_decision:technical_debt_item': 'decision_has_technical_debt',
+    'aggregate:domain_entity': 'aggregate_has_domain_entity',
+    'aggregate:value_object': 'aggregate_has_value_object',
+    'aggregate:command': 'aggregate_has_command',
+    // ── Growth ────────────────────────────────────────────────────────────────
+    'product:north_star_metric': 'product_has_north_star_metric',
+    'product:funnel': 'product_has_funnel',
+    'product:acquisition_channel': 'product_has_acquisition_channel',
+    'product:cohort': 'product_has_cohort',
+    'product:segment': 'product_has_segment',
+    'product:growth_loop': 'product_has_growth_loop',
+    'product:attribution_model': 'product_has_attribution_model',
+    'north_star_metric:input_metric': 'nsm_has_input_metric',
+    'input_metric:kpi': 'input_metric_drives_kpi',
+    'north_star_metric:funnel': 'north_star_metric_has_funnel',
+    'north_star_metric:acquisition_channel': 'north_star_metric_has_acquisition_channel',
+    'north_star_metric:growth_loop': 'north_star_metric_has_growth_loop',
+    'north_star_metric:attribution_model': 'north_star_metric_has_attribution_model',
+    'north_star_metric:cohort': 'north_star_metric_has_cohort',
+    'north_star_metric:segment': 'north_star_metric_has_segment',
+    'funnel:funnel_step': 'funnel_has_step',
+    'acquisition_channel:campaign': 'channel_has_campaign',
+    'campaign:growth_experiment': 'campaign_has_growth_experiment',
+    'growth_experiment:variant': 'growth_experiment_has_variant',
+    // ── Business Model ────────────────────────────────────────────────────────
+    'product:business_model': 'product_has_business_model',
+    'business_model:value_proposition': 'business_model_has_value_proposition',
+    'business_model:revenue_stream': 'business_model_has_revenue_stream',
+    'business_model:cost_structure': 'business_model_has_cost_structure',
+    'business_model:unit_economics': 'business_model_has_unit_economics',
+    'business_model:partnership': 'business_model_has_partnership',
+    'business_model:key_resource': 'business_model_has_key_resource',
+    'business_model:key_activity': 'business_model_has_key_activity',
+    'business_model:customer_segment_bm': 'business_model_has_customer_segment_bm',
+    'business_model:channel_bm': 'business_model_has_channel_bm',
+    'business_model:customer_relationship': 'business_model_has_customer_relationship',
+    'business_model:distribution_channel': 'business_model_has_distribution_channel',
+    'revenue_stream:pricing_tier': 'revenue_stream_has_pricing_tier',
+    // ── Go-To-Market ──────────────────────────────────────────────────────────
+    'product:gtm_strategy': 'product_has_gtm_strategy',
+    'gtm_strategy:ideal_customer_profile': 'gtm_has_icp',
+    'gtm_strategy:positioning': 'gtm_has_positioning',
+    'gtm_strategy:launch': 'gtm_has_launch',
+    'gtm_strategy:content_strategy': 'gtm_has_content_strategy',
+    'gtm_strategy:sales_motion': 'gtm_has_sales_motion',
+    'gtm_strategy:competitive_battle_card': 'gtm_has_competitive_battle_card',
+    'gtm_strategy:demand_gen_program': 'gtm_has_demand_gen_program',
+    'gtm_strategy:territory': 'gtm_has_territory',
+    'positioning:messaging': 'positioning_has_messaging',
+    'positioning:objection': 'positioning_has_objection',
+    'positioning:proof_point': 'positioning_has_proof_point',
+    'value_proposition:objection': 'value_proposition_has_objection',
+    'value_proposition:proof_point': 'value_proposition_has_proof_point',
+    'competitive_battle_card:objection': 'competitive_battle_card_has_objection',
+    'objection:rebuttal': 'objection_has_rebuttal',
+    'rebuttal:proof_point': 'rebuttal_has_proof_point',
+    // ── Team & Organisation ───────────────────────────────────────────────────
+    'product:team': 'product_has_team',
+    'product:stakeholder': 'product_has_stakeholder',
+    'product:product_decision': 'product_has_product_decision',
+    'product:department': 'product_has_department',
+    'department:team': 'department_has_team',
+    'department:stakeholder': 'department_has_stakeholder',
+    'team:role': 'team_has_role',
+    'team:team_okr': 'team_has_team_okr',
+    'team:retrospective': 'team_has_retrospective',
+    'team:dependency': 'team_has_dependency',
+    'team:skill': 'team_has_skill',
+    'team:ceremony': 'team_has_ceremony',
+    'team:capacity_plan': 'team_has_capacity_plan',
+    'team:product_decision': 'team_has_product_decision',
+    // ── Data & Analytics ──────────────────────────────────────────────────────
+    'product:data_source': 'product_has_data_source',
+    'product:event_schema': 'product_has_event_schema',
+    'product:dashboard': 'product_has_dashboard',
+    'product:data_domain': 'product_has_data_domain',
+    'product:glossary_term': 'product_has_glossary_term',
+    'data_source:metric_definition': 'data_source_has_metric_definition',
+    'data_source:data_pipeline': 'data_source_has_data_pipeline',
+    'data_source:data_lineage': 'data_source_has_data_lineage',
+    'data_source:event_schema': 'data_source_has_event_schema',
+    'metric_definition:data_quality_rule': 'metric_definition_has_data_quality_rule',
+    'data_domain:data_product': 'data_domain_has_data_product',
+    'data_domain:data_source': 'data_domain_has_data_source',
+    'data_domain:glossary_term': 'data_domain_has_glossary_term',
+    'data_domain:data_model': 'data_domain_has_data_model',
+    'data_domain:dashboard': 'data_domain_has_dashboard',
+    'dashboard:report': 'dashboard_has_report',
+    'dashboard:ab_test': 'dashboard_has_ab_test',
+    // ── Operations & Customer Success ─────────────────────────────────────────
+    'product:support_ticket': 'product_has_support_ticket',
+    'product:customer_feedback': 'product_has_customer_feedback',
+    'product:churn_reason': 'product_has_churn_reason',
+    'product:onboarding_flow': 'product_has_onboarding_flow',
+    'product:customer_health_score': 'product_has_customer_health_score',
+    'product:playbook': 'product_has_playbook',
+    'product:sla': 'product_has_sla',
+    'product:success_milestone': 'product_has_success_milestone',
+    'product:service_blueprint': 'product_has_service_blueprint',
+    'product:nps_score': 'product_has_nps_score',
+    'service_blueprint:onboarding_flow': 'service_blueprint_has_onboarding_flow',
+    'service_blueprint:playbook': 'service_blueprint_has_playbook',
+    'service_blueprint:sla': 'service_blueprint_has_sla',
+    'service_blueprint:customer_health_score': 'service_blueprint_has_customer_health_score',
+    'service_blueprint:support_ticket': 'service_blueprint_has_support_ticket',
+    'service_blueprint:customer_feedback': 'service_blueprint_has_customer_feedback',
+    'customer_health_score:nps_score': 'customer_health_score_has_nps_score',
+    'customer_health_score:success_milestone': 'customer_health_score_has_success_milestone',
+    'customer_feedback:churn_reason': 'customer_feedback_has_churn_reason',
+    'onboarding_flow:customer_journey_stage': 'onboarding_flow_has_customer_journey_stage',
+    'customer_journey_stage:touchpoint': 'customer_journey_stage_has_touchpoint',
+    // ── Content & Knowledge ───────────────────────────────────────────────────
+    'product:content_piece': 'product_has_content_piece',
+    'product:knowledge_base_article': 'product_has_knowledge_base_article',
+    'product:brand_asset': 'product_has_brand_asset',
+    'product:internal_doc': 'product_has_internal_doc',
+    'product:prompt_template': 'product_has_prompt_template',
+    'product:documentation_template': 'product_has_documentation_template',
+    'content_strategy:content_calendar': 'content_strategy_has_content_calendar',
+    'content_strategy:content_theme': 'content_strategy_has_content_theme',
+    'content_calendar:content_theme': 'content_calendar_has_content_theme',
+    'content_calendar:content_piece': 'content_calendar_has_content_piece',
+    'content_calendar:knowledge_base_article': 'content_calendar_has_knowledge_base_article',
+    'content_calendar:brand_asset': 'content_calendar_has_brand_asset',
+    'content_calendar:internal_doc': 'content_calendar_has_internal_doc',
+    'content_calendar:prompt_template': 'content_calendar_has_prompt_template',
+    'content_calendar:documentation_template': 'content_calendar_has_documentation_template',
+    // ── Legal, Compliance & Risk ──────────────────────────────────────────────
+    'product:compliance_requirement': 'product_has_compliance_requirement',
+    'product:risk': 'product_has_risk',
+    'product:data_contract': 'product_has_data_contract',
+    'product:legal_entity': 'product_has_legal_entity',
+    'product:audit_log_policy': 'product_has_audit_log_policy',
+    'product:privacy_policy': 'product_has_privacy_policy',
+    'product:compliance_framework': 'product_has_compliance_framework',
+    'legal_entity:ip_asset': 'legal_entity_has_ip_asset',
+    'legal_entity:contract': 'legal_entity_has_contract',
+    'contract:contract_clause': 'contract_has_contract_clause',
+    'compliance_framework:security_audit': 'compliance_framework_has_security_audit',
+    'compliance_framework:compliance_requirement': 'compliance_framework_has_compliance_requirement',
+    'compliance_framework:privacy_policy': 'compliance_framework_has_privacy_policy',
+    'compliance_framework:audit_log_policy': 'compliance_framework_has_audit_log_policy',
+    'compliance_framework:risk': 'compliance_framework_has_risk',
+    'compliance_framework:data_contract': 'compliance_framework_has_data_contract',
+    'compliance_framework:legal_entity': 'compliance_framework_has_legal_entity',
+    // ── DevOps & Platform ─────────────────────────────────────────────────────
+    'product:slo': 'product_has_slo',
+    'product:incident': 'product_has_incident',
+    'product:runbook': 'product_has_runbook',
+    'product:monitor': 'product_has_monitor',
+    'product:ci_pipeline': 'product_has_ci_pipeline',
+    'product:release_strategy': 'product_has_release_strategy',
+    'product:on_call_rotation': 'product_has_on_call_rotation',
+    'product:infrastructure_component': 'product_has_infrastructure_component',
+    'slo:sli': 'slo_has_sli',
+    'slo:error_budget': 'slo_has_error_budget',
+    'incident:postmortem': 'incident_has_postmortem',
+    'monitor:alert_rule': 'monitor_has_alert_rule',
+    'ci_pipeline:build_artifact': 'ci_pipeline_has_build_artifact',
+    'infrastructure_component:slo': 'infrastructure_component_has_slo',
+    'infrastructure_component:monitor': 'infrastructure_component_has_monitor',
+    'infrastructure_component:ci_pipeline': 'infrastructure_component_has_ci_pipeline',
+    'infrastructure_component:incident': 'infrastructure_component_has_incident',
+    'infrastructure_component:runbook': 'infrastructure_component_has_runbook',
+    'infrastructure_component:release_strategy': 'infrastructure_component_has_release_strategy',
+    'infrastructure_component:on_call_rotation': 'infrastructure_component_has_on_call_rotation',
+    // ── Security ──────────────────────────────────────────────────────────────
+    'product:threat_model': 'product_has_threat_model',
+    'product:security_control': 'product_has_security_control',
+    'product:security_policy': 'product_has_security_policy',
+    'product:security_incident': 'product_has_security_incident',
+    'product:penetration_test': 'product_has_penetration_test',
+    'product:security_review': 'product_has_security_review',
+    'product:data_classification': 'product_has_data_classification',
+    'product:access_policy': 'product_has_access_policy',
+    'threat_model:threat': 'threat_model_has_threat',
+    'threat_model:vulnerability': 'threat_model_has_vulnerability',
+    'security_policy:security_control': 'security_policy_has_security_control',
+    'security_policy:access_policy': 'security_policy_has_access_policy',
+    'security_policy:data_classification': 'security_policy_has_data_classification',
+    'security_policy:threat_model': 'security_policy_has_threat_model',
+    'security_policy:security_review': 'security_policy_has_security_review',
+    'security_policy:security_incident': 'security_policy_has_security_incident',
+    'security_review:penetration_test': 'security_review_has_penetration_test',
+    // ── Sales & Revenue ───────────────────────────────────────────────────────
+    'product:pipeline_sales': 'product_has_pipeline_sales',
+    'product:account': 'product_has_account',
+    'product:lead': 'product_has_lead',
+    'product:subscription': 'product_has_subscription',
+    'product:forecast': 'product_has_forecast',
+    'pipeline_sales:pipeline_stage': 'pipeline_sales_has_pipeline_stage',
+    'pipeline_sales:lead': 'pipeline_sales_has_lead',
+    'pipeline_sales:account': 'pipeline_sales_has_account',
+    'pipeline_sales:forecast': 'pipeline_sales_has_forecast',
+    'pipeline_sales:subscription': 'pipeline_sales_has_subscription',
+    'account:contact': 'account_has_contact',
+    'account:deal': 'account_has_deal',
+    'deal:quote_document': 'deal_has_quote_document',
+    'subscription:invoice': 'subscription_has_invoice',
+    // ── Program Management ────────────────────────────────────────────────────
+    'product:program': 'product_has_program',
+    'program:project': 'program_has_project',
+    'program:risk_register': 'program_has_risk_register',
+    'program:change_request': 'program_has_change_request',
+    'program:resource_allocation': 'program_has_resource_allocation',
+    'program:status_report': 'program_has_status_report',
+    'project:milestone': 'project_has_milestone',
+    'project:deliverable': 'project_has_deliverable',
+    'risk_register:risk_item': 'risk_register_has_risk_item',
+    // ── Accessibility ─────────────────────────────────────────────────────────
+    'product:a11y_standard': 'product_has_a11y_standard',
+    'product:a11y_audit': 'product_has_a11y_audit',
+    'product:a11y_annotation': 'product_has_a11y_annotation',
+    'a11y_standard:a11y_guideline': 'a11y_standard_has_a11y_guideline',
+    'a11y_standard:a11y_audit': 'a11y_standard_has_a11y_audit',
+    'a11y_standard:a11y_annotation': 'a11y_standard_has_a11y_annotation',
+    'a11y_audit:a11y_issue': 'a11y_audit_has_a11y_issue',
+    // ── Marketing & Communications ────────────────────────────────────────────
+    'product:marketing_strategy': 'product_has_marketing_strategy',
+    'product:press_release': 'product_has_press_release',
+    'product:event': 'product_has_event',
+    'product:community_initiative': 'product_has_community_initiative',
+    'marketing_strategy:marketing_channel': 'marketing_strategy_has_marketing_channel',
+    'marketing_strategy:seo_keyword': 'marketing_strategy_has_seo_keyword',
+    'marketing_strategy:press_release': 'marketing_strategy_has_press_release',
+    'marketing_strategy:event': 'marketing_strategy_has_event',
+    'marketing_strategy:community_initiative': 'marketing_strategy_has_community_initiative',
+    'marketing_channel:marketing_campaign_plan': 'marketing_channel_has_marketing_campaign_plan',
+    'marketing_campaign_plan:email_sequence': 'marketing_campaign_plan_has_email_sequence',
+    'marketing_campaign_plan:social_post': 'marketing_campaign_plan_has_social_post',
+    'marketing_campaign_plan:ad_creative': 'marketing_campaign_plan_has_ad_creative',
+    // ── Localisation & i18n ───────────────────────────────────────────────────
+    'product:locale': 'product_has_locale',
+    'product:locale_config': 'product_has_locale_config',
+    'locale:translation_bundle': 'locale_has_translation_bundle',
+    'locale:cultural_adaptation': 'locale_has_cultural_adaptation',
+    'locale:regional_pricing': 'locale_has_regional_pricing',
+    'locale:locale_config': 'locale_has_locale_config',
+    'translation_bundle:translation_key': 'translation_bundle_has_translation_key',
+    // ── Customer Education & Training ─────────────────────────────────────────
+    'product:education_program': 'product_has_education_program',
+    'education_program:tutorial': 'education_program_has_tutorial',
+    'education_program:walkthrough': 'education_program_has_walkthrough',
+    'education_program:webinar': 'education_program_has_webinar',
+    'education_program:certification': 'education_program_has_certification',
+    'education_program:help_video': 'education_program_has_help_video',
+    'education_program:learning_path': 'education_program_has_learning_path',
+    'learning_path:tutorial': 'learning_path_has_tutorial',
+    // ── Quality Assurance & Testing ───────────────────────────────────────────
+    'product:test_suite': 'product_has_test_suite',
+    'product:qa_session': 'product_has_qa_session',
+    'product:test_coverage_report': 'product_has_test_coverage_report',
+    'product:test_environment': 'product_has_test_environment',
+    'test_suite:test_case': 'test_suite_has_test_case',
+    'test_suite:regression_test': 'test_suite_has_regression_test',
+    'test_suite:qa_session': 'test_suite_has_qa_session',
+    'test_suite:test_coverage_report': 'test_suite_has_test_coverage_report',
+    'test_suite:test_environment': 'test_suite_has_test_environment',
+    'qa_session:defect_report': 'qa_session_has_defect_report',
+    // ── Partner & Ecosystem Management ────────────────────────────────────────
+    'product:partner_program': 'product_has_partner_program',
+    'product:api_ecosystem': 'product_has_api_ecosystem',
+    'product:developer_portal': 'product_has_developer_portal',
+    'partner_program:partner_tier': 'partner_program_has_partner_tier',
+    'partner_program:integration_partner': 'partner_program_has_integration_partner',
+    'partner_program:partner_revenue_share': 'partner_program_has_partner_revenue_share',
+    'partner_program:api_ecosystem': 'partner_program_has_api_ecosystem',
+    'partner_program:developer_portal': 'partner_program_has_developer_portal',
+    'api_ecosystem:marketplace_listing': 'api_ecosystem_has_marketplace_listing',
+    // ── Feedback & Voice of Customer ──────────────────────────────────────────
+    'product:feedback_program': 'product_has_feedback_program',
+    'product:user_advisory_board': 'product_has_user_advisory_board',
+    'product:beta_program': 'product_has_beta_program',
+    'feedback_program:feature_request': 'feedback_program_has_feature_request',
+    'feedback_program:nps_campaign': 'feedback_program_has_nps_campaign',
+    'feedback_program:feedback_theme': 'feedback_program_has_feedback_theme',
+    'feedback_program:user_advisory_board': 'feedback_program_has_user_advisory_board',
+    'feedback_program:beta_program': 'feedback_program_has_beta_program',
+    'feature_request:feedback_vote': 'feature_request_has_feedback_vote',
+    // ── Pricing & Packaging ───────────────────────────────────────────────────
+    'product:pricing_strategy': 'product_has_pricing_strategy',
+    'pricing_strategy:pricing_experiment': 'pricing_strategy_has_pricing_experiment',
+    'pricing_strategy:package': 'pricing_strategy_has_package',
+    'pricing_strategy:discount_strategy': 'pricing_strategy_has_discount_strategy',
+    'pricing_strategy:trial_config': 'pricing_strategy_has_trial_config',
+    'pricing_strategy:paywall': 'pricing_strategy_has_paywall',
+    // ── AI/ML Operations ──────────────────────────────────────────────────────
+    'product:ai_model': 'product_has_ai_model',
+    'product:model_comparison': 'product_has_model_comparison',
+    'ai_model:prompt_version': 'ai_model_has_prompt_version',
+    'ai_model:eval_benchmark': 'ai_model_has_eval_benchmark',
+    'ai_model:ai_cost_tracker': 'ai_model_has_ai_cost_tracker',
+    'ai_model:hallucination_report': 'ai_model_has_hallucination_report',
+    'ai_model:ai_guardrail': 'ai_model_has_ai_guardrail',
+    'ai_model:model_comparison': 'ai_model_has_model_comparison',
+    'eval_benchmark:eval_run': 'eval_benchmark_has_eval_run',
+    // ── Agentic Workflows & Process ───────────────────────────────────────────
+    'product:workflow_template': 'product_has_workflow_template',
+    'product:agent_definition': 'product_has_agent_definition',
+    'workflow_template:workflow_run': 'workflow_template_has_workflow_run',
+    'workflow_template:review_gate': 'workflow_template_has_review_gate',
+    'workflow_run:workflow_artifact': 'workflow_run_has_workflow_artifact',
+    'agent_definition:agent_session': 'agent_definition_has_agent_session',
+    'agent_definition:agent_skill': 'agent_definition_has_agent_skill',
+    'agent_definition:agent_hook': 'agent_definition_has_agent_hook',
+    'agent_definition:workflow_template': 'agent_definition_has_workflow_template',
+    'review_gate:approval_record': 'review_gate_has_approval_record',
+    // ── Portfolio ─────────────────────────────────────────────────────────────
+    'product:product_area': 'product_has_product_area',
+    'organization:portfolio': 'organization_has_portfolio',
+    'portfolio:product': 'portfolio_has_product',
+    // ── Research → User ───────────────────────────────────────────────────────
+    'finding:pain_point': 'finding_validates_pain_point',
+    'finding:desired_outcome': 'finding_reveals_desired_outcome',
+    'finding:jtbd': 'finding_informs_jtbd',
+    'finding:persona': 'finding_characterises_persona',
+    'finding:user_need': 'finding_validates_user_need',
+    'observation:pain_point': 'observation_reveals_pain_point',
+    'observation:persona': 'observation_relates_to_persona',
+    'quote:pain_point': 'quote_evidences_pain_point',
+    'quote:jtbd': 'quote_evidences_jtbd',
+    'research_insight:persona': 'insight_enriches_persona',
+    'research_insight:pain_point': 'insight_validates_pain_point',
+    // ── Research → Discovery ──────────────────────────────────────────────────
+    'finding:opportunity': 'finding_surfaces_opportunity',
+    'finding:solution': 'finding_informs_solution',
+    'finding:how_might_we': 'finding_inspires_hmw',
+    'finding:design_concept': 'finding_inspires_concept',
+    'research_insight:opportunity': 'insight_surfaces_opportunity',
+    'research_insight:solution': 'insight_informs_solution',
+    'observation:ux_insight': 'observation_yields_ux_insight',
+    // ── Validation → Discovery ────────────────────────────────────────────────
+    'learning:opportunity': 'learning_validates_opportunity',
+    'learning:solution': 'learning_validates_solution',
+    'learning:hypothesis': 'learning_refines_hypothesis',
+    'learning:pain_point': 'learning_validates_pain_point',
+    'learning:jtbd': 'learning_validates_jtbd',
+    'learning:feature': 'learning_informs_feature',
+    'evidence:opportunity': 'evidence_supports_opportunity',
+    'evidence:hypothesis': 'evidence_supports_hypothesis',
+    'experiment:feature': 'experiment_tests_feature',
+    // ── Design → Engineering ──────────────────────────────────────────────────
+    'design_component:feature': 'component_implements_feature',
+    'design_component:service': 'component_uses_service',
+    'prototype:feature': 'prototype_validates_feature',
+    'wireframe:feature': 'wireframe_specifies_feature',
+    'user_flow:feature': 'flow_requires_feature',
+    // ── Design → User ────────────────────────────────────────────────────────
+    'user_journey:persona': 'journey_maps_persona',
+    'user_journey:jtbd': 'journey_addresses_jtbd',
+    'user_flow:persona': 'flow_targets_persona',
+    'journey_step:pain_point': 'step_reveals_pain_point',
+    // ── Market → Strategy ─────────────────────────────────────────────────────
+    'competitive_analysis:outcome': 'analysis_informs_outcome',
+    'competitive_analysis:opportunity': 'analysis_reveals_opportunity',
+    'competitive_analysis:strategic_theme': 'analysis_informs_theme',
+    'market_trend:opportunity': 'trend_creates_opportunity',
+    'market_trend:strategic_theme': 'trend_informs_theme',
+    'competitor_feature:feature': 'competitor_feature_inspires_feature',
+    'competitor:persona': 'competitor_competes_for_persona',
+    'competitor_feature:solution': 'competitor_feature_inspires_solution',
+    // ── Growth → User / Market ────────────────────────────────────────────────
+    'acquisition_channel:segment': 'channel_targets_segment',
+    'acquisition_channel:persona': 'channel_reaches_persona',
+    'funnel:persona': 'funnel_maps_persona',
+    'cohort:persona': 'cohort_represents_persona',
+    'segment:persona': 'segment_maps_persona',
+    // ── Business Model → User / Strategy ──────────────────────────────────────
+    'revenue_stream:outcome': 'revenue_stream_drives_outcome',
+    'revenue_stream:kpi': 'revenue_stream_measured_by_kpi',
+    'value_proposition:persona': 'vp_targets_persona',
+    'value_proposition:jtbd': 'vp_addresses_jtbd',
+    'value_proposition:pain_point': 'vp_solves_pain_point',
+    // ── Engineering → Product Spec ────────────────────────────────────────────
+    'service:feature': 'service_powers_feature',
+    'bounded_context:feature': 'context_contains_feature',
+    'technical_debt_item:feature': 'debt_blocks_feature',
+    'api_endpoint:feature': 'endpoint_serves_feature',
+    // ── GTM → User / Market ───────────────────────────────────────────────────
+    'ideal_customer_profile:persona': 'icp_maps_persona',
+    'ideal_customer_profile:segment': 'icp_targets_segment',
+    'positioning:persona': 'positioning_resonates_persona',
+    'positioning:competitor': 'positioning_differentiates_competitor',
+    'launch:feature': 'launch_ships_feature',
+    'launch:release': 'launch_announces_release',
+    // ── Ops & CS → User / Spec ────────────────────────────────────────────────
+    'customer_feedback:pain_point': 'feedback_surfaces_pain_point',
+    'customer_feedback:feature_request': 'feedback_becomes_request',
+    'support_ticket:bug': 'ticket_reports_bug',
+    'support_ticket:pain_point': 'ticket_reveals_pain_point',
+    'churn_reason:pain_point': 'churn_reveals_pain_point',
+    // ── Feedback & VoC → Product Spec / Discovery ─────────────────────────────
+    'feature_request:feature': 'request_becomes_feature',
+    'feature_request:opportunity': 'request_surfaces_opportunity',
+    'feedback_theme:pain_point': 'theme_maps_pain_point',
+    // ── Program Mgmt → Product Spec ───────────────────────────────────────────
+    'milestone:release': 'milestone_triggers_release',
+    'deliverable:feature': 'deliverable_ships_feature',
+    'project:epic': 'project_delivers_epic',
+    // ── Data & Analytics → Strategy / Growth ──────────────────────────────────
+    'metric_definition:kpi': 'metric_measures_kpi',
+    'metric_definition:input_metric': 'metric_measures_input_metric',
+    'ab_test:hypothesis': 'ab_test_tests_hypothesis',
+    'dashboard:kpi': 'dashboard_tracks_kpi',
+    // ── Product Spec → User ───────────────────────────────────────────────────
+    'user_story:persona': 'story_serves_persona',
+    'feature:jtbd': 'feature_fulfils_jtbd',
+    'feature:pain_point': 'feature_solves_pain_point',
+};
+/** Set of all extended edge type values for O(1) membership checks */
+export const UPG_EXTENDED_EDGE_TYPES_SET = new Set(Object.values(UPG_EXTENDED_EDGE_MAP));
+//# sourceMappingURL=index.js.map

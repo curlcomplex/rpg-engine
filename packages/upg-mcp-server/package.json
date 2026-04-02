@@ -1,0 +1,47 @@
+{
+  "name": "@upg/mcp-server",
+  "version": "0.1.0",
+  "description": "Local MCP server for .upg files — read and write product knowledge graphs offline",
+  "license": "MIT",
+  "author": "The Product Creator <hello@theproductcreator.com>",
+  "homepage": "https://unifiedproductgraph.org",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/tpc-faheem/the-product-creator",
+    "directory": "packages/upg-mcp-server"
+  },
+  "type": "module",
+  "bin": {
+    "upg-mcp-server": "./dist/index.js"
+  },
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "tsup",
+    "dev": "echo '@upg/mcp-server: standalone only — run with: npx upg-mcp-server --file <path.upg>'",
+    "lint": "eslint src/",
+    "type-check": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.27.0",
+    "@upg/core": "file:../upg-core",
+    "chokidar": "^4.0.0",
+    "nanoid": "^5.1.0"
+  },
+  "devDependencies": {
+    "tsup": "^8.5.1",
+    "tsx": "^4.0.0",
+    "typescript": "^5.8.0"
+  },
+  "keywords": [
+    "mcp",
+    "upg",
+    "unified-product-graph",
+    "product-management",
+    "model-context-protocol",
+    "knowledge-graph"
+  ]
+}
