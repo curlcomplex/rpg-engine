@@ -1,0 +1,901 @@
+/**
+ * UPG Rosetta Stone — Framework Vocabulary Map
+ *
+ * Every UPG entity type mapped to its canonical label, alternative names,
+ * and framework-specific labels. This is the single source of truth for
+ * "what does framework X call this concept?"
+ *
+ * Registry-driven: imports UPG_ACTIVE_TYPES from entity-meta.ts to ensure
+ * coverage matches exactly the active set (skips deprecated types).
+ * Imports UPG_MIGRATIONS from migrations.ts to auto-include old type names
+ * as alt_labels for consolidated types.
+ *
+ * Used by:
+ * - View renderers (show framework-native labels)
+ * - Entity creation UI (search by any synonym)
+ * - TYPE_ALIASES (auto-generated from alt_labels)
+ * - Copilot context (framework-aware prompts)
+ * - Import/export (map external tool types to UPG)
+ *
+ * Framework IDs match the JSON filenames in packages/upg-spec/frameworks/:
+ *   ost, design_thinking, bmc, lean_canvas, aarrr, okr_tree, rice, moscow, kano, dora
+ *
+ * Additional framework IDs used for labels not yet backed by JSON definitions:
+ *   jtbd, vpc, lean_startup, running_lean
+ *
+ * NOTE: Uses consolidated type names from the schema maturity plan.
+ */
+import { UPG_ACTIVE_TYPES } from './entity-meta.js';
+import { UPG_MIGRATIONS } from './migrations.js';
+// ─── Priority entries (high framework coverage) ─────────────────────────────────
+/**
+ * Hand-authored label entries for types that appear across multiple frameworks.
+ * These are the "Rosetta Stone" entries — the ones users will encounter across views.
+ */
+const PRIORITY_LABELS = [
+    // ── need (CONSOLIDATED: replaces pain_point + user_need) ─────────────────────
+    {
+        id: 'need',
+        canonical_label: 'Need',
+        alt_labels: [
+            'pain point', 'pain', 'user need', 'customer need',
+            'problem', 'struggle', 'customer pain', 'frustration',
+            'gap', 'unmet need', 'user problem',
+        ],
+        framework_labels: {
+            lean_canvas: 'Problem',
+            design_thinking: 'Pain Point',
+            ost: 'Opportunity (need)',
+            jtbd: 'Struggle',
+            vpc: 'Customer Pain',
+        },
+        designations: {
+            pain: 'Pain Point',
+            gap: 'Need',
+            desire: 'Desire',
+            constraint: 'Constraint',
+        },
+    },
+    // ── opportunity ──────────────────────────────────────────────────────────────
+    {
+        id: 'opportunity',
+        canonical_label: 'Opportunity',
+        alt_labels: ['product opportunity', 'market opportunity', 'user opportunity'],
+        framework_labels: {
+            ost: 'Opportunity',
+        },
+    },
+    // ── solution ─────────────────────────────────────────────────────────────────
+    {
+        id: 'solution',
+        canonical_label: 'Solution',
+        alt_labels: ['proposed solution', 'solution idea', 'concept', 'approach'],
+        framework_labels: {
+            ost: 'Solution',
+            design_thinking: 'Solution',
+            lean_canvas: 'Solution',
+            rice: 'Scored Solution',
+        },
+    },
+    // ── experiment (CONSOLIDATED: absorbs ab_test, growth_experiment, pricing_experiment) ──
+    {
+        id: 'experiment',
+        canonical_label: 'Experiment',
+        alt_labels: [
+            'test', 'validation', 'ab test', 'a/b test', 'split test',
+            'growth experiment', 'pricing experiment', 'usability test',
+            'discovery experiment',
+        ],
+        framework_labels: {
+            ost: 'Experiment',
+            design_thinking: 'Test',
+            lean_startup: 'Experiment',
+        },
+        designations: {
+            discovery: 'Discovery Experiment',
+            ab_test: 'A/B Test',
+            growth: 'Growth Experiment',
+            pricing: 'Pricing Experiment',
+            usability: 'Usability Test',
+        },
+    },
+    // ── hypothesis ───────────────────────────────────────────────────────────────
+    {
+        id: 'hypothesis',
+        canonical_label: 'Hypothesis',
+        alt_labels: ['bet', 'testable assumption', 'leap of faith'],
+        framework_labels: {
+            lean_startup: 'Hypothesis',
+            running_lean: 'Riskiest Assumption',
+            lean_canvas: 'Riskiest Assumption',
+        },
+    },
+    // ── metric (CONSOLIDATED: absorbs kpi, north_star_metric, input_metric, metric_definition) ──
+    {
+        id: 'metric',
+        canonical_label: 'Metric',
+        alt_labels: [
+            'kpi', 'key performance indicator', 'north star metric', 'nsm',
+            'input metric', 'output metric', 'metric definition',
+            'measure', 'indicator', 'signal', 'counter metric', 'guardrail metric',
+        ],
+        framework_labels: {
+            aarrr: 'Pirate Metric',
+            dora: 'DORA Metric',
+            lean_canvas: 'Key Metric',
+            okr_tree: 'Key Result Metric',
+        },
+        designations: {
+            north_star: 'North Star Metric',
+            kpi: 'KPI',
+            input: 'Input Metric',
+            output: 'Output Metric',
+            guardrail: 'Guardrail Metric',
+            counter: 'Counter Metric',
+            health: 'Health Metric',
+        },
+    },
+    // ── persona ──────────────────────────────────────────────────────────────────
+    {
+        id: 'persona',
+        canonical_label: 'Persona',
+        alt_labels: ['user persona', 'buyer persona', 'customer persona', 'user type', 'archetype', 'actor'],
+        framework_labels: {
+            design_thinking: 'Persona',
+            lean_canvas: 'Customer Segment',
+            bmc: 'Customer Archetype',
+        },
+    },
+    // ── desired_outcome ──────────────────────────────────────────────────────────
+    {
+        id: 'desired_outcome',
+        canonical_label: 'Desired Outcome',
+        alt_labels: ['gain', 'user gain', 'customer gain', 'expected outcome'],
+        framework_labels: {
+            ost: 'Desired Outcome',
+            jtbd: 'Desired Outcome',
+            vpc: 'Customer Gain',
+        },
+    },
+    // ── insight (CONSOLIDATED: absorbs research_insight, finding, ux_insight) ────
+    {
+        id: 'insight',
+        canonical_label: 'Insight',
+        alt_labels: [
+            'research insight', 'finding', 'ux insight', 'user insight',
+            'discovery', 'key finding', 'research finding', 'design insight',
+            'analytics insight', 'feedback insight',
+        ],
+        framework_labels: {
+            design_thinking: 'Finding',
+            ost: 'Insight',
+        },
+        designations: {
+            atomic: 'Atomic Insight',
+            composite: 'Composite Insight',
+            strategic: 'Strategic Insight',
+        },
+    },
+    // ── jtbd ─────────────────────────────────────────────────────────────────────
+    {
+        id: 'jtbd',
+        canonical_label: 'Job-to-be-Done',
+        alt_labels: ['job to be done', 'jtbd', 'job', 'customer job', 'user job', 'functional job', 'social job', 'emotional job'],
+        framework_labels: {
+            ost: 'Opportunity (job)',
+            design_thinking: 'Task',
+            jtbd: 'Job',
+            vpc: 'Customer Job',
+        },
+    },
+    // ── outcome ──────────────────────────────────────────────────────────────────
+    {
+        id: 'outcome',
+        canonical_label: 'Outcome',
+        alt_labels: ['desired outcome', 'product outcome', 'business outcome', 'target outcome'],
+        framework_labels: {
+            ost: 'Desired Outcome',
+            okr_tree: 'Outcome',
+        },
+    },
+    // ── objective ────────────────────────────────────────────────────────────────
+    {
+        id: 'objective',
+        canonical_label: 'Objective',
+        alt_labels: ['goal', 'strategic goal', 'team goal'],
+        framework_labels: {
+            okr_tree: 'Objective',
+        },
+    },
+    // ── key_result ───────────────────────────────────────────────────────────────
+    {
+        id: 'key_result',
+        canonical_label: 'Key Result',
+        alt_labels: ['kr', 'measurable result', 'target'],
+        framework_labels: {
+            okr_tree: 'Key Result',
+        },
+    },
+    // ── feature ──────────────────────────────────────────────────────────────────
+    {
+        id: 'feature',
+        canonical_label: 'Feature',
+        alt_labels: ['capability', 'product feature', 'functionality'],
+        framework_labels: {
+            rice: 'Scored Item',
+            moscow: 'Prioritised Item',
+            kano: 'Classified Feature',
+        },
+    },
+    // ── user_story ───────────────────────────────────────────────────────────────
+    {
+        id: 'user_story',
+        canonical_label: 'User Story',
+        alt_labels: ['story', 'requirement', 'as a... i want... so that...'],
+        framework_labels: {
+            moscow: 'Prioritised Story',
+        },
+    },
+    // ── Business Model Canvas types ──────────────────────────────────────────────
+    {
+        id: 'value_proposition',
+        canonical_label: 'Value Proposition',
+        alt_labels: ['value prop', 'vp', 'unique value proposition', 'uvp', 'unfair advantage'],
+        framework_labels: {
+            bmc: 'Value Proposition',
+            lean_canvas: 'Unique Value Proposition',
+            vpc: 'Value Map',
+        },
+    },
+    {
+        id: 'partnership',
+        canonical_label: 'Partnership',
+        alt_labels: ['key partner', 'partner', 'key partners', 'strategic partner'],
+        framework_labels: {
+            bmc: 'Key Partner',
+        },
+    },
+    {
+        id: 'key_resource',
+        canonical_label: 'Key Resource',
+        alt_labels: ['resource', 'key asset', 'critical resource'],
+        framework_labels: {
+            bmc: 'Key Resource',
+        },
+    },
+    {
+        id: 'key_activity',
+        canonical_label: 'Key Activity',
+        alt_labels: ['activity', 'core activity', 'critical activity'],
+        framework_labels: {
+            bmc: 'Key Activity',
+        },
+    },
+    {
+        id: 'customer_segment_bm',
+        canonical_label: 'Customer Segment',
+        alt_labels: ['customer segment', 'segment', 'target segment', 'audience'],
+        framework_labels: {
+            bmc: 'Customer Segment',
+            lean_canvas: 'Customer Segment',
+        },
+    },
+    {
+        id: 'channel_bm',
+        canonical_label: 'Channel',
+        alt_labels: ['channel', 'distribution channel', 'sales channel', 'go-to-market channel'],
+        framework_labels: {
+            bmc: 'Channel',
+            lean_canvas: 'Channel',
+        },
+    },
+    {
+        id: 'customer_relationship',
+        canonical_label: 'Customer Relationship',
+        alt_labels: ['relationship', 'engagement model', 'customer engagement'],
+        framework_labels: {
+            bmc: 'Customer Relationship',
+        },
+    },
+    {
+        id: 'revenue_stream',
+        canonical_label: 'Revenue Stream',
+        alt_labels: ['revenue', 'income stream', 'monetization'],
+        framework_labels: {
+            bmc: 'Revenue Stream',
+            lean_canvas: 'Revenue Stream',
+        },
+    },
+    {
+        id: 'cost_structure',
+        canonical_label: 'Cost Structure',
+        alt_labels: ['costs', 'expense', 'cost base', 'operating cost'],
+        framework_labels: {
+            bmc: 'Cost Structure',
+            lean_canvas: 'Cost Structure',
+        },
+    },
+    // ── Design Thinking types ────────────────────────────────────────────────────
+    {
+        id: 'observation',
+        canonical_label: 'Observation',
+        alt_labels: ['field note', 'user observation', 'behavioural note', 'ethnographic note'],
+        framework_labels: {
+            design_thinking: 'Observation',
+        },
+    },
+    {
+        id: 'how_might_we',
+        canonical_label: 'How Might We',
+        alt_labels: ['hmw', 'design challenge', 'problem reframe', 'opportunity question'],
+        framework_labels: {
+            design_thinking: 'How Might We',
+        },
+    },
+    {
+        id: 'design_concept',
+        canonical_label: 'Design Concept',
+        alt_labels: ['concept', 'design idea', 'concept sketch'],
+        framework_labels: {
+            design_thinking: 'Concept',
+        },
+    },
+    {
+        id: 'prototype',
+        canonical_label: 'Prototype',
+        alt_labels: ['mockup', 'mock', 'poc', 'proof of concept', 'lo-fi', 'hi-fi'],
+        framework_labels: {
+            design_thinking: 'Prototype',
+        },
+    },
+    // ── AARRR types ──────────────────────────────────────────────────────────────
+    {
+        id: 'funnel',
+        canonical_label: 'Funnel',
+        alt_labels: ['conversion funnel', 'user funnel', 'marketing funnel', 'sales funnel'],
+        framework_labels: {
+            aarrr: 'AARRR Funnel',
+        },
+    },
+    {
+        id: 'funnel_step',
+        canonical_label: 'Funnel Step',
+        alt_labels: ['funnel stage', 'conversion stage', 'lifecycle stage'],
+        framework_labels: {
+            aarrr: 'Pirate Metric Stage',
+        },
+    },
+    // ── DORA types ───────────────────────────────────────────────────────────────
+    {
+        id: 'deployment',
+        canonical_label: 'Deployment',
+        alt_labels: ['deploy', 'release deployment', 'ship event'],
+        framework_labels: {
+            dora: 'Deployment',
+        },
+    },
+    {
+        id: 'ci_pipeline',
+        canonical_label: 'CI Pipeline',
+        alt_labels: ['pipeline', 'ci/cd', 'build pipeline', 'github actions workflow'],
+        framework_labels: {
+            dora: 'Deployment Pipeline',
+        },
+    },
+    {
+        id: 'sli',
+        canonical_label: 'SLI',
+        alt_labels: ['service level indicator', 'reliability indicator'],
+        framework_labels: {
+            dora: 'Service Level Indicator',
+        },
+    },
+    {
+        id: 'slo',
+        canonical_label: 'SLO',
+        alt_labels: ['service level objective', 'reliability target'],
+        framework_labels: {
+            dora: 'Service Level Objective',
+        },
+    },
+    // ── Consolidated types (non-priority but have designations) ──────────────────
+    {
+        id: 'decision',
+        canonical_label: 'Decision',
+        alt_labels: ['product decision', 'strategic decision', 'team decision'],
+        framework_labels: {},
+        designations: {
+            product: 'Product Decision',
+            architecture: 'Architecture Decision',
+            strategic: 'Strategic Decision',
+            operational: 'Operational Decision',
+        },
+    },
+    {
+        id: 'risk',
+        canonical_label: 'Risk',
+        alt_labels: ['risk item', 'project risk', 'programme risk'],
+        framework_labels: {},
+        designations: {
+            technical: 'Technical Risk',
+            business: 'Business Risk',
+            legal: 'Legal Risk',
+            security: 'Security Risk',
+            program: 'Program Risk',
+        },
+    },
+    {
+        id: 'incident',
+        canonical_label: 'Incident',
+        alt_labels: ['outage', 'service incident', 'security incident', 'production incident'],
+        framework_labels: {
+            dora: 'Incident',
+        },
+        designations: {
+            operational: 'Operational Incident',
+            security: 'Security Incident',
+            performance: 'Performance Incident',
+        },
+    },
+    {
+        id: 'user_flow',
+        canonical_label: 'User Flow',
+        alt_labels: ['flow', 'task flow', 'user path', 'navigation path', 'onboarding flow'],
+        framework_labels: {},
+        designations: {
+            onboarding: 'Onboarding Flow',
+            activation: 'Activation Flow',
+            checkout: 'Checkout Flow',
+            general: 'User Flow',
+        },
+    },
+    {
+        id: 'support_ticket',
+        canonical_label: 'Support Ticket',
+        alt_labels: [
+            'ticket', 'support case', 'customer issue', 'help request',
+            'defect report', 'bug report',
+        ],
+        framework_labels: {},
+        designations: {
+            question: 'Support Question',
+            bug: 'Bug Report',
+            feature_request: 'Feature Request',
+            defect: 'Defect Report',
+        },
+    },
+];
+// ─── Standard labels (canonical_label + alt_labels, no framework labels) ────────
+/**
+ * Standard label entries for types that don't appear in major frameworks.
+ * Most engineering, ops, security, and administrative types live here.
+ * canonical_label is Title Case of the id; alt_labels are common synonyms.
+ */
+const STANDARD_LABELS = {
+    // Strategic layer
+    product: { alt_labels: ['offering', 'app', 'service', 'platform'] },
+    vision: { alt_labels: ['product vision', 'north star vision', 'long-term vision'] },
+    mission: { alt_labels: ['mission statement', 'purpose'] },
+    strategic_theme: { alt_labels: ['theme', 'strategic pillar', 'focus area'] },
+    initiative: { alt_labels: ['strategic initiative', 'program initiative', 'workstream'] },
+    capability: { alt_labels: ['business capability', 'organizational capability'] },
+    value_stream: { alt_labels: ['value chain', 'stream'] },
+    strategic_pillar: { alt_labels: ['pillar', 'foundation'] },
+    assumption: { alt_labels: ['belief', 'working assumption', 'premise'] },
+    // User layer
+    job_step: { alt_labels: ['job stage', 'job phase', 'job map step'] },
+    switching_cost: { alt_labels: ['lock-in', 'migration cost', 'switching barrier'] },
+    // Discovery layer
+    feasibility_study: { alt_labels: ['feasibility assessment', 'viability study', 'tech spike'] },
+    design_sprint: { alt_labels: ['sprint', 'gv sprint', 'google ventures sprint'] },
+    // Validation layer
+    learning: { alt_labels: ['validated learning', 'lesson learned', 'takeaway'] },
+    test_plan: { alt_labels: ['experiment plan', 'validation plan'] },
+    research_plan: { alt_labels: ['study plan', 'research brief'] },
+    evidence: { alt_labels: ['proof', 'supporting data', 'signal'] },
+    variant: { alt_labels: ['test variant', 'experiment arm', 'variation'] },
+    // Market layer
+    competitor: { alt_labels: ['rival', 'alternative', 'competitive product', 'competing product'] },
+    competitor_feature: { alt_labels: ['competitive feature', 'rival capability'] },
+    market_trend: { alt_labels: ['trend', 'industry trend', 'macro trend'] },
+    market_segment: { alt_labels: ['segment', 'market slice', 'tam segment', 'sam segment'] },
+    competitive_analysis: { alt_labels: ['competitor analysis', 'competitive landscape', 'market analysis'] },
+    // UX Research layer
+    research_study: { alt_labels: ['study', 'user study', 'research project', 'ux study'] },
+    participant: { alt_labels: ['research participant', 'interviewee', 'respondent', 'test subject'] },
+    quote: { alt_labels: ['user quote', 'verbatim', 'voice of customer'] },
+    affinity_cluster: { alt_labels: ['cluster', 'affinity group', 'theme cluster', 'affinity note'] },
+    research_question: { alt_labels: ['rq', 'study question', 'inquiry'] },
+    interview_guide: { alt_labels: ['discussion guide', 'interview script', 'moderator guide'] },
+    survey_response: { alt_labels: ['survey answer', 'questionnaire response'] },
+    // Design layer
+    user_journey: { alt_labels: ['journey map', 'customer journey', 'experience map', 'journey'] },
+    journey_step: { alt_labels: ['touchpoint', 'journey stage', 'journey phase'] },
+    design_component: { alt_labels: ['component', 'ui component', 'design element'] },
+    design_token: { alt_labels: ['token', 'style token', 'css variable'] },
+    wireframe: { alt_labels: ['wireflow', 'lo-fi mockup', 'skeleton'] },
+    design_pattern: { alt_labels: ['ui pattern', 'ux pattern', 'interaction pattern'] },
+    design_guideline: { alt_labels: ['style guide', 'design rule', 'design standard'] },
+    annotation: { alt_labels: ['design annotation', 'spec note', 'callout'] },
+    interaction_spec: { alt_labels: ['interaction specification', 'motion spec', 'behaviour spec'] },
+    design_system: { alt_labels: ['component library', 'style system', 'ui kit'] },
+    screen: { alt_labels: ['page', 'view', 'route', 'ui state'] },
+    screen_state: { alt_labels: ['view state', 'empty state', 'loading state', 'error state'] },
+    // Brand layer
+    brand_identity: { alt_labels: ['brand', 'brand guidelines', 'brand book'] },
+    brand_colour: { alt_labels: ['brand color', 'colour palette', 'color palette'] },
+    brand_typography: { alt_labels: ['typeface', 'font family', 'type system'] },
+    brand_voice: { alt_labels: ['tone of voice', 'brand tone', 'writing style'] },
+    // Product Specification layer
+    epic: { alt_labels: ['initiative', 'large story', 'feature set'] },
+    acceptance_criterion: { alt_labels: ['ac', 'done criterion', 'acceptance criteria', 'definition of done'] },
+    release: { alt_labels: ['version', 'ship', 'launch version', 'build'] },
+    task: { alt_labels: ['work item', 'todo', 'subtask', 'ticket'] },
+    bug: { alt_labels: ['defect', 'issue', 'regression'] },
+    roadmap: { alt_labels: ['product roadmap', 'release plan', 'timeline'] },
+    roadmap_item: { alt_labels: ['roadmap entry', 'planned item'] },
+    theme: { alt_labels: ['product theme', 'bucket', 'category'] },
+    // Engineering layer
+    bounded_context: { alt_labels: ['context', 'domain boundary', 'module boundary'] },
+    service: { alt_labels: ['microservice', 'backend service', 'api service'] },
+    domain_event: { alt_labels: ['event', 'system event', 'business event'] },
+    api_contract: { alt_labels: ['api spec', 'api schema', 'contract', 'openapi spec'] },
+    architecture_decision: { alt_labels: ['adr', 'architecture decision record', 'tech decision', 'arc'] },
+    technical_debt_item: { alt_labels: ['tech debt', 'debt', 'tech debt item', 'cleanup'] },
+    feature_flag: { alt_labels: ['flag', 'toggle', 'feature toggle', 'release flag'] },
+    aggregate: { alt_labels: ['aggregate root', 'ddd aggregate'] },
+    domain_entity: { alt_labels: ['entity', 'ddd entity', 'domain object'] },
+    value_object: { alt_labels: ['vo', 'ddd value object'] },
+    command: { alt_labels: ['cqrs command', 'write command', 'mutation'] },
+    read_model: { alt_labels: ['projection', 'query model', 'cqrs read model'] },
+    api_endpoint: { alt_labels: ['endpoint', 'route', 'api route'] },
+    database_schema: { alt_labels: ['schema', 'db schema', 'table definition'] },
+    queue_topic: { alt_labels: ['topic', 'message queue', 'event bus topic', 'pubsub topic'] },
+    build_artifact: { alt_labels: ['artifact', 'binary', 'docker image', 'package'] },
+    code_repository: { alt_labels: ['repo', 'repository', 'git repo', 'codebase'] },
+    library_dependency: { alt_labels: ['dependency', 'package', 'library', 'npm package'] },
+    integration_pattern: { alt_labels: ['integration', 'pattern', 'middleware pattern'] },
+    external_api: { alt_labels: ['third-party api', 'vendor api', 'saas integration'] },
+    data_flow: { alt_labels: ['data movement', 'data transfer', 'pipeline flow'] },
+    // Growth layer
+    acquisition_channel: { alt_labels: ['channel', 'traffic source', 'user source'] },
+    campaign: { alt_labels: ['marketing campaign', 'ad campaign', 'growth campaign'] },
+    cohort: { alt_labels: ['user cohort', 'retention cohort', 'signup cohort'] },
+    segment: { alt_labels: ['user segment', 'audience segment', 'behavioural segment'] },
+    growth_loop: { alt_labels: ['viral loop', 'referral loop', 'flywheel'] },
+    attribution_model: { alt_labels: ['attribution', 'marketing attribution', 'channel attribution'] },
+    // Business Model layer
+    business_model: { alt_labels: ['model', 'biz model'] },
+    pricing_tier: { alt_labels: ['plan', 'pricing plan', 'tier'] },
+    unit_economics: { alt_labels: ['unit econ', 'ltv/cac', 'economics'] },
+    distribution_channel: { alt_labels: ['distribution', 'delivery channel'] },
+    // Go-To-Market layer
+    gtm_strategy: { alt_labels: ['go-to-market strategy', 'go to market', 'gtm plan', 'launch strategy'] },
+    ideal_customer_profile: { alt_labels: ['icp', 'target customer', 'ideal buyer'] },
+    positioning: { alt_labels: ['market positioning', 'positioning statement', 'brand position'] },
+    messaging: { alt_labels: ['messaging framework', 'value messaging', 'key messages'] },
+    launch: { alt_labels: ['product launch', 'go-live', 'ship date'] },
+    content_strategy: { alt_labels: ['editorial strategy', 'content plan'] },
+    sales_motion: { alt_labels: ['sales model', 'sales approach', 'plg', 'self-serve', 'sales-led'] },
+    competitive_battle_card: { alt_labels: ['battle card', 'competitive card', 'win/loss card'] },
+    demand_gen_program: { alt_labels: ['demand generation', 'demand gen', 'lead gen program'] },
+    territory: { alt_labels: ['sales territory', 'region', 'geo'] },
+    objection: { alt_labels: ['customer objection', 'sales objection', 'pushback'] },
+    rebuttal: { alt_labels: ['counter-argument', 'objection handler', 'response'] },
+    proof_point: { alt_labels: ['evidence point', 'case study reference', 'social proof'] },
+    // Team & Organisation layer
+    team: { alt_labels: ['squad', 'pod', 'tribe', 'team unit'] },
+    role: { alt_labels: ['position', 'job title', 'responsibility'] },
+    stakeholder: { alt_labels: ['sponsor', 'decision maker', 'approver'] },
+    team_okr: { alt_labels: ['team objective', 'team goal'] },
+    retrospective: { alt_labels: ['retro', 'sprint retro', 'team retro', 'post-mortem'] },
+    dependency: { alt_labels: ['team dependency', 'cross-team dependency', 'blocker'] },
+    department: { alt_labels: ['org unit', 'division', 'business unit'] },
+    skill: { alt_labels: ['competency', 'capability', 'expertise'] },
+    ceremony: { alt_labels: ['ritual', 'meeting cadence', 'standup', 'retrospective meeting'] },
+    capacity_plan: { alt_labels: ['resourcing plan', 'staffing plan', 'headcount plan'] },
+    // Data & Analytics layer
+    data_source: { alt_labels: ['source', 'data origin', 'database'] },
+    event_schema: { alt_labels: ['tracking plan', 'event definition', 'analytics event'] },
+    dashboard: { alt_labels: ['analytics dashboard', 'report dashboard', 'monitoring dashboard'] },
+    data_model: { alt_labels: ['erd', 'entity relationship diagram', 'schema model'] },
+    data_quality_rule: { alt_labels: ['data rule', 'quality check', 'data validation'] },
+    data_product: { alt_labels: ['data asset', 'data offering'] },
+    data_pipeline: { alt_labels: ['etl', 'elt', 'ingestion pipeline', 'data flow'] },
+    data_lineage: { alt_labels: ['lineage', 'data provenance', 'data trail'] },
+    glossary_term: { alt_labels: ['term', 'definition', 'business term'] },
+    data_domain: { alt_labels: ['data area', 'data subject area'] },
+    report: { alt_labels: ['analytics report', 'business report'] },
+    // Operations & Customer Success layer
+    customer_feedback: { alt_labels: ['feedback', 'user feedback', 'csat response'] },
+    churn_reason: { alt_labels: ['cancellation reason', 'churn driver', 'attrition cause'] },
+    customer_health_score: { alt_labels: ['health score', 'customer health', 'account health'] },
+    playbook: { alt_labels: ['cs playbook', 'success playbook', 'engagement playbook'] },
+    sla: { alt_labels: ['service level agreement', 'sla policy', 'response time commitment'] },
+    customer_journey_stage: { alt_labels: ['journey stage', 'lifecycle stage', 'customer stage'] },
+    touchpoint: { alt_labels: ['interaction point', 'contact point', 'engagement point'] },
+    success_milestone: { alt_labels: ['cs milestone', 'onboarding milestone', 'adoption milestone'] },
+    service_blueprint: { alt_labels: ['blueprint', 'service map', 'service design'] },
+    nps_campaign: { alt_labels: ['nps survey', 'nps score', 'net promoter score', 'nps'] },
+    // Content & Knowledge layer
+    content_piece: { alt_labels: ['content', 'article', 'blog post', 'content asset'] },
+    knowledge_base_article: { alt_labels: ['kb article', 'help article', 'faq', 'support doc'] },
+    brand_asset: { alt_labels: ['asset', 'creative asset', 'marketing asset'] },
+    internal_doc: { alt_labels: ['internal document', 'wiki page', 'confluence page', 'notion doc'] },
+    prompt_template: { alt_labels: ['prompt', 'ai prompt', 'system prompt', 'template'] },
+    changelog: { alt_labels: ['release notes', "what's new", 'update log'] },
+    content_calendar: { alt_labels: ['editorial calendar', 'publishing schedule'] },
+    content_theme: { alt_labels: ['editorial theme', 'content pillar', 'topic cluster'] },
+    documentation_template: { alt_labels: ['doc template', 'template'] },
+    // Legal, Compliance & Risk layer
+    compliance_requirement: { alt_labels: ['regulation', 'compliance rule', 'regulatory requirement'] },
+    data_contract: { alt_labels: ['data agreement', 'data sharing agreement'] },
+    legal_entity: { alt_labels: ['company', 'subsidiary', 'legal body'] },
+    ip_asset: { alt_labels: ['intellectual property', 'patent', 'trademark', 'ip'] },
+    audit_log_policy: { alt_labels: ['audit policy', 'logging policy', 'retention policy'] },
+    contract: { alt_labels: ['agreement', 'legal contract'] },
+    contract_clause: { alt_labels: ['clause', 'term', 'provision'] },
+    privacy_policy: { alt_labels: ['privacy notice', 'data privacy policy'] },
+    compliance_framework: { alt_labels: ['regulatory framework', 'iso standard', 'soc2'] },
+    security_audit: { alt_labels: ['audit', 'compliance audit', 'security assessment'] },
+    // DevOps & Platform layer
+    error_budget: { alt_labels: ['reliability budget', 'downtime budget'] },
+    postmortem: { alt_labels: ['post-mortem', 'incident review', 'rca', 'root cause analysis'] },
+    runbook: { alt_labels: ['operations guide', 'playbook', 'sop', 'standard operating procedure'] },
+    monitor: { alt_labels: ['health check', 'synthetic monitor', 'uptime check'] },
+    alert_rule: { alt_labels: ['alert', 'pager rule', 'notification rule'] },
+    release_strategy: { alt_labels: ['rollout strategy', 'deployment strategy', 'canary release'] },
+    on_call_rotation: { alt_labels: ['on-call schedule', 'pager rotation', 'incident rotation'] },
+    infrastructure_component: { alt_labels: ['infra', 'cloud resource', 'server', 'container'] },
+    // Security layer
+    threat_model: { alt_labels: ['threat analysis', 'stride model', 'attack surface'] },
+    threat: { alt_labels: ['attack vector', 'security threat', 'risk vector'] },
+    vulnerability: { alt_labels: ['vuln', 'cve', 'security flaw', 'weakness'] },
+    security_control: { alt_labels: ['control', 'safeguard', 'countermeasure', 'mitigation'] },
+    security_policy: { alt_labels: ['infosec policy', 'security standard'] },
+    penetration_test: { alt_labels: ['pentest', 'pen test', 'security test'] },
+    security_review: { alt_labels: ['code review', 'security assessment', 'audit'] },
+    data_classification: { alt_labels: ['classification', 'sensitivity level', 'data label'] },
+    access_policy: { alt_labels: ['iam policy', 'rbac rule', 'permission', 'access control'] },
+    // Sales & Revenue layer
+    account: { alt_labels: ['customer account', 'client', 'organization'] },
+    contact: { alt_labels: ['person', 'buyer', 'champion'] },
+    lead: { alt_labels: ['prospect', 'mql', 'sql', 'marketing lead'] },
+    deal: { alt_labels: ['opportunity', 'sales opportunity', 'opp'] },
+    pipeline_sales: { alt_labels: ['sales pipeline', 'deal pipeline', 'revenue pipeline'] },
+    pipeline_stage: { alt_labels: ['deal stage', 'sales stage'] },
+    quote_document: { alt_labels: ['quote', 'proposal', 'estimate', 'quotation'] },
+    subscription: { alt_labels: ['recurring revenue', 'saas subscription', 'plan'] },
+    invoice: { alt_labels: ['bill', 'payment request'] },
+    forecast: { alt_labels: ['revenue forecast', 'sales forecast', 'projection'] },
+    // Program Management layer
+    program: { alt_labels: ['programme', 'initiative portfolio'] },
+    project: { alt_labels: ['workstream', 'work package'] },
+    milestone: { alt_labels: ['checkpoint', 'gate', 'deadline'] },
+    risk_register: { alt_labels: ['risk log', 'risk tracker'] },
+    change_request: { alt_labels: ['cr', 'rfc', 'scope change', 'change order'] },
+    deliverable: { alt_labels: ['output', 'work product', 'artifact'] },
+    resource_allocation: { alt_labels: ['allocation', 'assignment', 'staffing'] },
+    status_report: { alt_labels: ['sitrep', 'progress report', 'weekly update'] },
+    // Accessibility layer
+    a11y_standard: { alt_labels: ['accessibility standard', 'wcag', 'ada requirement'] },
+    a11y_guideline: { alt_labels: ['accessibility guideline', 'wcag guideline'] },
+    a11y_audit: { alt_labels: ['accessibility audit', 'a11y review'] },
+    a11y_issue: { alt_labels: ['accessibility issue', 'a11y bug', 'accessibility violation'] },
+    a11y_annotation: { alt_labels: ['accessibility annotation', 'aria note'] },
+    // Marketing & Communications layer
+    marketing_strategy: { alt_labels: ['marketing plan', 'growth strategy'] },
+    marketing_channel: { alt_labels: ['channel', 'paid channel', 'organic channel'] },
+    marketing_campaign_plan: { alt_labels: ['campaign plan', 'launch campaign'] },
+    email_sequence: { alt_labels: ['drip campaign', 'nurture sequence', 'email flow'] },
+    social_post: { alt_labels: ['tweet', 'linkedin post', 'social media post'] },
+    seo_keyword: { alt_labels: ['keyword', 'search term', 'target keyword'] },
+    ad_creative: { alt_labels: ['ad', 'advertisement', 'creative'] },
+    press_release: { alt_labels: ['pr', 'media release', 'announcement'] },
+    event: { alt_labels: ['conference', 'meetup', 'webinar event', 'launch event'] },
+    community_initiative: { alt_labels: ['community program', 'community project', 'developer community'] },
+    // Localisation & i18n layer
+    locale: { alt_labels: ['language', 'region', 'l10n target'] },
+    translation_key: { alt_labels: ['i18n key', 'message key', 'string key'] },
+    translation_bundle: { alt_labels: ['language file', 'locale bundle', 'message bundle'] },
+    locale_config: { alt_labels: ['locale settings', 'regional config'] },
+    cultural_adaptation: { alt_labels: ['localization', 'cultural customization', 'market adaptation'] },
+    regional_pricing: { alt_labels: ['geo pricing', 'ppp pricing', 'local pricing'] },
+    // Customer Education & Training layer
+    education_program: { alt_labels: ['training program', 'onboarding program', 'academy'] },
+    tutorial: { alt_labels: ['how-to', 'guide', 'getting started'] },
+    walkthrough: { alt_labels: ['product tour', 'guided tour', 'interactive guide'] },
+    webinar: { alt_labels: ['live demo', 'online workshop', 'virtual event'] },
+    certification: { alt_labels: ['cert', 'credential', 'badge'] },
+    help_video: { alt_labels: ['tutorial video', 'screencast', 'how-to video'] },
+    learning_path: { alt_labels: ['curriculum', 'course track', 'learning journey'] },
+    // Quality Assurance & Testing layer
+    test_suite: { alt_labels: ['test collection', 'test group'] },
+    test_case: { alt_labels: ['test', 'test scenario', 'verification step'] },
+    qa_session: { alt_labels: ['testing session', 'exploratory test', 'qa round'] },
+    regression_test: { alt_labels: ['regression', 'regression check'] },
+    test_coverage_report: { alt_labels: ['coverage report', 'coverage'] },
+    test_environment: { alt_labels: ['staging', 'qa environment', 'sandbox'] },
+    // Partner & Ecosystem Management layer
+    partner_program: { alt_labels: ['partnership program', 'channel program'] },
+    partner_tier: { alt_labels: ['partner level', 'partnership tier'] },
+    api_ecosystem: { alt_labels: ['platform ecosystem', 'developer ecosystem', 'integration ecosystem'] },
+    marketplace_listing: { alt_labels: ['listing', 'app store listing', 'marketplace entry'] },
+    developer_portal: { alt_labels: ['dev portal', 'api docs site', 'developer hub'] },
+    integration_partner: { alt_labels: ['tech partner', 'integration vendor'] },
+    partner_revenue_share: { alt_labels: ['rev share', 'commission', 'affiliate payout'] },
+    // Feedback & Voice of Customer layer
+    feedback_program: { alt_labels: ['voice of customer program', 'voc program'] },
+    feature_request: { alt_labels: ['request', 'product request', 'enhancement request'] },
+    feedback_vote: { alt_labels: ['upvote', 'vote', 'user vote'] },
+    user_advisory_board: { alt_labels: ['cab', 'customer advisory board', 'advisory council'] },
+    beta_program: { alt_labels: ['beta', 'early access', 'preview program'] },
+    feedback_theme: { alt_labels: ['feedback cluster', 'theme', 'feedback category'] },
+    // Pricing & Packaging layer
+    pricing_strategy: { alt_labels: ['pricing model', 'monetization strategy'] },
+    package: { alt_labels: ['product package', 'bundle', 'sku'] },
+    discount_strategy: { alt_labels: ['discount', 'promotion', 'coupon strategy'] },
+    trial_config: { alt_labels: ['free trial', 'trial settings', 'trial period'] },
+    paywall: { alt_labels: ['gate', 'upgrade wall', 'monetization gate'] },
+    // AI/ML Operations layer
+    ai_model: { alt_labels: ['model', 'ml model', 'llm', 'machine learning model'] },
+    prompt_version: { alt_labels: ['prompt revision', 'prompt iteration'] },
+    eval_benchmark: { alt_labels: ['benchmark', 'evaluation', 'eval suite'] },
+    eval_run: { alt_labels: ['evaluation run', 'benchmark run', 'eval result'] },
+    ai_cost_tracker: { alt_labels: ['llm cost', 'token usage', 'ai spend'] },
+    hallucination_report: { alt_labels: ['hallucination', 'factuality error', 'grounding failure'] },
+    ai_guardrail: { alt_labels: ['guardrail', 'safety rail', 'content filter'] },
+    model_comparison: { alt_labels: ['model eval', 'a/b model test', 'model benchmark'] },
+    // Agentic Workflows & Process layer
+    workflow_template: { alt_labels: ['workflow', 'process template', 'automation'] },
+    workflow_run: { alt_labels: ['run', 'execution', 'workflow execution'] },
+    agent_definition: { alt_labels: ['agent', 'ai agent', 'autonomous agent'] },
+    agent_session: { alt_labels: ['session', 'agent run', 'agent conversation'] },
+    review_gate: { alt_labels: ['approval gate', 'quality gate', 'stage gate'] },
+    approval_record: { alt_labels: ['approval', 'sign-off', 'authorization'] },
+    agent_skill: { alt_labels: ['skill', 'tool', 'agent capability'] },
+    agent_hook: { alt_labels: ['hook', 'trigger', 'callback'] },
+    workflow_artifact: { alt_labels: ['artifact', 'output artifact', 'generated artifact'] },
+    // Portfolio layer
+    organization: { alt_labels: ['org', 'company', 'enterprise', 'organisation'] },
+    portfolio: { alt_labels: ['product portfolio', 'product line', 'product suite'] },
+    product_area: { alt_labels: ['area', 'product domain', 'vertical'] },
+};
+// ─── Build the complete map ─────────────────────────────────────────────────────
+/**
+ * Convert snake_case to Title Case, respecting known abbreviations.
+ */
+function toTitleCase(id) {
+    const UPPER = new Set([
+        'kpi', 'jtbd', 'okr', 'sli', 'slo', 'sla', 'api', 'ci', 'ip', 'qa',
+        'ai', 'ml', 'ab', 'bm', 'nps', 'seo', 'gtm', 'erd',
+    ]);
+    return id
+        .split('_')
+        .map((w) => {
+        if (UPPER.has(w))
+            return w.toUpperCase();
+        if (w === 'a11y')
+            return 'A11y';
+        return w.charAt(0).toUpperCase() + w.slice(1);
+    })
+        .join(' ');
+}
+/**
+ * Collect old type names that migrate into a given canonical type.
+ * These become additional alt_labels automatically.
+ */
+function getMigrationAliases(canonicalType) {
+    const aliases = [];
+    for (const migrations of Object.values(UPG_MIGRATIONS)) {
+        for (const m of migrations) {
+            if (m.to === canonicalType) {
+                // Add the old type name as a Title Case alias
+                aliases.push(m.from.replace(/_/g, ' '));
+            }
+        }
+    }
+    return aliases;
+}
+// Index priority labels by id for O(1) lookup during assembly
+const _priorityIndex = new Map(PRIORITY_LABELS.map((p) => [p.id, p]));
+/**
+ * The complete Rosetta Stone — one UPGTypeLabel for every active type.
+ *
+ * Assembly logic:
+ * 1. If a type has a PRIORITY_LABELS entry → use it (richest framework_labels)
+ * 2. Else if a type has a STANDARD_LABELS entry → build from that
+ * 3. Else → auto-generate from the type name (canonical_label only)
+ *
+ * In all cases, migration aliases are merged into alt_labels automatically.
+ */
+export const UPG_TYPE_LABELS = UPG_ACTIVE_TYPES.map((typeName) => {
+    const migrationAliases = getMigrationAliases(typeName);
+    // 1. Priority entry (hand-authored with framework_labels)
+    const priority = _priorityIndex.get(typeName);
+    if (priority) {
+        // Merge migration aliases that aren't already in alt_labels
+        const existingSet = new Set(priority.alt_labels.map((a) => a.toLowerCase()));
+        const newAliases = migrationAliases.filter((a) => !existingSet.has(a.toLowerCase()));
+        return {
+            ...priority,
+            alt_labels: [...priority.alt_labels, ...newAliases],
+        };
+    }
+    // 2. Standard entry (alt_labels only)
+    const standard = STANDARD_LABELS[typeName];
+    if (standard) {
+        const existingSet = new Set(standard.alt_labels.map((a) => a.toLowerCase()));
+        const newAliases = migrationAliases.filter((a) => !existingSet.has(a.toLowerCase()));
+        return {
+            id: typeName,
+            canonical_label: toTitleCase(typeName),
+            alt_labels: [...standard.alt_labels, ...newAliases],
+            framework_labels: {},
+        };
+    }
+    // 3. Auto-generated (no hand-authored synonyms)
+    return {
+        id: typeName,
+        canonical_label: toTitleCase(typeName),
+        alt_labels: migrationAliases,
+        framework_labels: {},
+    };
+});
+// ─── Lookup helpers ─────────────────────────────────────────────────────────────
+/** O(1) lookup by entity type id */
+export const UPG_TYPE_LABELS_MAP = new Map(UPG_TYPE_LABELS.map((entry) => [entry.id, entry]));
+/**
+ * Resolve the display label for an entity type, with optional framework context.
+ *
+ * Priority:
+ * 1. If frameworkId provided and a framework_labels entry exists → use it
+ * 2. If designation provided and a designations entry exists → use it
+ * 3. Fall back to canonical_label
+ * 4. Fall back to Title Case of the id
+ */
+export function resolveLabel(entityType, frameworkId, designation) {
+    const entry = UPG_TYPE_LABELS_MAP.get(entityType);
+    if (!entry) {
+        // Unknown type — best-effort Title Case
+        return toTitleCase(entityType);
+    }
+    if (frameworkId && entry.framework_labels[frameworkId]) {
+        return entry.framework_labels[frameworkId];
+    }
+    if (designation && entry.designations?.[designation]) {
+        return entry.designations[designation];
+    }
+    return entry.canonical_label;
+}
+// ─── Auto-generated TYPE_ALIASES ────────────────────────────────────────────────
+/**
+ * Build the TYPE_ALIASES map from alt_labels.
+ *
+ * Replaces the hand-maintained TYPE_ALIASES in validation.ts.
+ * Maps every alt_label (and its snake_case variant) → canonical entity type id.
+ *
+ * Collision rule: first entry wins (entries earlier in UPG_TYPE_LABELS take priority).
+ */
+export function buildTypeAliases() {
+    const aliases = {};
+    for (const entry of UPG_TYPE_LABELS) {
+        for (const label of entry.alt_labels) {
+            // Normalise to snake_case for matching
+            const snaked = label.toLowerCase().replace(/[\s\-\/]+/g, '_');
+            // First entry wins — don't overwrite existing aliases
+            if (!aliases[snaked]) {
+                aliases[snaked] = entry.id;
+            }
+            // Also store the raw lowercase version (for natural-language matching)
+            const lower = label.toLowerCase();
+            if (lower !== snaked && !aliases[lower]) {
+                aliases[lower] = entry.id;
+            }
+        }
+    }
+    return aliases;
+}
+/** Pre-built alias map — import this instead of calling buildTypeAliases() repeatedly */
+export const TYPE_ALIASES = buildTypeAliases();
+//# sourceMappingURL=type-labels.js.map

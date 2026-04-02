@@ -3,6 +3,10 @@
     "rpg-engine": {
       "command": "node",
       "args": ["./mcp-server/dist/index.js", "--file", "./world.rpg", "--campaigns", "./campaigns"]
+    },
+    "upg-local": {
+      "command": "node",
+      "args": ["./packages/upg-mcp-server/dist/index.js", "--file", "./rpg-engine.upg", "--title", "RPG Engine"]
     }
   }
 }

@@ -1,0 +1,35 @@
+{
+  "name": "@upg/core",
+  "version": "0.1.0",
+  "description": "Unified Product Graph — open specification and TypeScript types for product knowledge",
+  "type": "module",
+  "license": "MIT",
+  "author": "The Product Creator <hello@theproductcreator.com>",
+  "homepage": "https://unifiedproductgraph.org",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/tpc-faheem/the-product-creator",
+    "directory": "packages/upg-spec"
+  },
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    }
+  },
+  "files": ["dist", "spec", "README.md"],
+  "scripts": {
+    "build": "tsc"
+  },
+  "keywords": [
+    "product-management",
+    "product-graph",
+    "upg",
+    "unified-product-graph",
+    "product-knowledge",
+    "open-standard",
+    "ontology"
+  ]
+}
