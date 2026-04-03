@@ -2,7 +2,7 @@
 import { parseArgs } from 'node:util';
 import { resolve, dirname } from 'node:path';
 import { StdioServerTransport } from '@modelcontextprotocol/sdk/server/stdio.js';
-import { WorldStore } from './store.js';
+import { WorldStore } from '@rpg-engine/core';
 import { createServer } from './server.js';
 
 const { values } = parseArgs({
