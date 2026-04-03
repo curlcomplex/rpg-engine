@@ -7,9 +7,9 @@
 
 ### Engine Extraction
 
-- [ ] **ENG-01**: Game engine functions (dice, narrative, queries, store, types) extracted into `packages/engine/` as a shared TypeScript package
-- [ ] **ENG-02**: MCP server refactored as thin adapter importing from shared engine package
-- [ ] **ENG-03**: MCP server passes all existing functionality after refactor (regression verified)
+- [x] **ENG-01**: Game engine functions (dice, narrative, queries, store, types) extracted into `packages/engine/` as a shared TypeScript package
+- [x] **ENG-02**: MCP server refactored as thin adapter importing from shared engine package
+- [x] **ENG-03**: MCP server passes all existing functionality after refactor (regression verified)
 - [ ] **ENG-04**: NPC character nodes support structured properties: backstory, voice guide (cadence, vocabulary, tics, formality), arc (lie, wound, truth), interaction_history[]
 - [ ] **ENG-05**: `interview_npc` creates bidirectional KNOWS edges -- NPC learns what player shares, not just player learns from NPC
 - [ ] **ENG-06**: `interview_npc` appends to NPC's interaction_history after each conversation
@@ -126,9 +126,9 @@
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| ENG-01 | Phase 1 | Pending |
-| ENG-02 | Phase 1 | Pending |
-| ENG-03 | Phase 1 | Pending |
+| ENG-01 | Phase 1 | Complete |
+| ENG-02 | Phase 1 | Complete |
+| ENG-03 | Phase 1 | Complete |
 | ENG-04 | Phase 1 | Pending |
 | ENG-05 | Phase 1 | Pending |
 | ENG-06 | Phase 1 | Pending |

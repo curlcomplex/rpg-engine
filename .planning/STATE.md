@@ -10,27 +10,27 @@ See: .planning/PROJECT.md (updated 2026-04-03)
 ## Current Position
 
 Phase: 1 of 5 (Engine Extraction)
-Plan: 0 of 2 in current phase
-Status: Ready to plan
-Last activity: 2026-04-03 -- Roadmap created (5 phases, 48 requirements mapped)
+Plan: 1 of 2 in current phase
+Status: Executing
+Last activity: 2026-04-03 -- Completed 01-01-PLAN.md (engine extraction)
 
-Progress: [░░░░░░░░░░] 0%
+Progress: [█░░░░░░░░░] 10%
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 0
-- Average duration: -
-- Total execution time: 0 hours
+- Total plans completed: 1
+- Average duration: 4min
+- Total execution time: 0.07 hours
 
 **By Phase:**
 
 | Phase | Plans | Total | Avg/Plan |
 |-------|-------|-------|----------|
-| - | - | - | - |
+| 01-engine-extraction | 1 | 4min | 4min |
 
 **Recent Trend:**
-- Last 5 plans: -
+- Last 5 plans: 4min
 - Trend: -
 
 *Updated after each plan completion*
@@ -44,6 +44,9 @@ Recent decisions affecting current work:
 
 - Roadmap: Compressed 6 research-recommended phases to 5 (merged Onboarding/Sessions with Deployment) per quick depth setting
 - Roadmap: Phase 5 combines onboarding, persistence, and deployment because all are "last mile" work with no dependencies between them
+- 01-01: Used file: dependency link (not npm workspace) to keep mcp-server and engine loosely coupled
+- 01-01: Tool definitions live in engine package so both MCP and future web adapters can share them
+- 01-01: Campaign management handlers stay in server.ts because they use node:fs directly (adapter-specific)
 
 ### Pending Todos
 
@@ -58,5 +61,5 @@ None yet.
 ## Session Continuity
 
 Last session: 2026-04-03
-Stopped at: Roadmap created, ready to plan Phase 1
+Stopped at: Completed 01-01-PLAN.md (engine extraction into @rpg-engine/core)
 Resume file: None
