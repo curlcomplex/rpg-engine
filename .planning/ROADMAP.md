@@ -44,11 +44,12 @@ Plans:
   2. User can log in, stay logged in across browser refreshes (HTTP-only cookie), and log out
   3. User can enter their Anthropic API key on a settings page, key is validated via test API call, and stored encrypted (AES-256-GCM) on the server
   4. User without a valid API key sees a clear error directing them to settings when they try to start a game
-**Plans**: TBD
+**Plans:** 3 plans
 
 Plans:
-- [ ] 02-01: TBD
-- [ ] 02-02: TBD
+- [ ] 02-01-PLAN.md -- Scaffold Next.js app, create lib modules (auth, crypto, users, invite codes), middleware, data directory
+- [ ] 02-02-PLAN.md -- Auth routes (register, login, logout) and auth UI pages (login, register forms)
+- [ ] 02-03-PLAN.md -- API key management (encrypt/store/validate) and settings page with key gate
 
 ### Phase 3: Claude API Integration
 **Goal**: Server can run a complete RPG turn -- take player input, call Claude with the system prompt and all 25 game tools, execute the tool-use loop, and stream narration back via SSE
@@ -106,8 +107,8 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 5
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 1. Engine Extraction | 0/2 | Not started | - |
-| 2. Auth and Storage | 0/2 | Not started | - |
+| 1. Engine Extraction | 2/2 | Complete | 2026-04-03 |
+| 2. Auth and Storage | 0/3 | Planning complete | - |
 | 3. Claude API Integration | 0/2 | Not started | - |
 | 4. Chat UI and Sidebar | 0/2 | Not started | - |
 | 5. Onboarding, Sessions, and Deployment | 0/3 | Not started | - |
