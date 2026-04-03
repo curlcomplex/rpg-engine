@@ -29,11 +29,11 @@ Decimal phases appear between their surrounding integers in numeric order.
   2. MCP server imports from the shared engine package and passes all existing functionality (regression verified by running existing playtest scenarios)
   3. NPC character nodes store structured backstory, voice guide, arc, and interaction_history -- and `interview_npc` updates both sides of a conversation (bidirectional KNOWS edges, interaction_history append)
   4. `investigate` no longer creates duplicate KNOWS edges, and opinion edges are created for new NPCs on first interaction
-**Plans**: TBD
+**Plans:** 2 plans
 
 Plans:
-- [ ] 01-01: TBD
-- [ ] 01-02: TBD
+- [ ] 01-01-PLAN.md -- Extract engine into packages/engine/, rewire MCP server as thin adapter
+- [ ] 01-02-PLAN.md -- NPC type interfaces, bug fixes (investigate duplicates, opinion edge), bidirectional KNOWS, interaction_history
 
 ### Phase 2: Auth and Storage
 **Goal**: Users can register with an invite code, log in securely, store their Anthropic API key, and have a personal data directory ready for world files
