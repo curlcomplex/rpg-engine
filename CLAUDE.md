@@ -28,6 +28,12 @@ The file `rpg-engine.upg` is a product graph that tracks every feature, bug, ide
 
 **MCP server config:** `upg-local` in `.mcp.json`. If unavailable, edit `rpg-engine.upg` directly — it's JSON with nodes[] and edges[].
 
+**Commands**: `/upg`, `/upg-journey`, `/upg-init`, `/upg-create`, `/upg-status`, `/upg-gaps`, `/upg-capture`
+
+**UPG plans, GSD executes.** UPG owns product thinking. GSD owns execution. Do not use GSD for open-ended planning. Do not use UPG for code execution.
+
+**UPG Capture Rule — NON-NEGOTIABLE**: When product thinking happens in conversation, write it to the graph IMMEDIATELY. Do not defer. If it's not in the graph, it didn't happen.
+
 ## Core Rules
 
 - **The engine decides WHAT happens.** Dice rolls, block resolution, NPC knowledge — all mechanical. Call `attempt_action` for risky actions. NEVER override dice results.
