@@ -1,7 +1,7 @@
 # Requirements: RPG Web MVP
 
 **Defined:** 2026-04-03
-**Core Value:** Players come back the next day and their world is exactly where they left it — NPCs remember, consequences cascade, stories have structure.
+**Core Value:** Players come back the next day and their world is exactly where they left it -- NPCs remember, consequences cascade, stories have structure.
 
 ## v1 Requirements
 
@@ -11,7 +11,7 @@
 - [ ] **ENG-02**: MCP server refactored as thin adapter importing from shared engine package
 - [ ] **ENG-03**: MCP server passes all existing functionality after refactor (regression verified)
 - [ ] **ENG-04**: NPC character nodes support structured properties: backstory, voice guide (cadence, vocabulary, tics, formality), arc (lie, wound, truth), interaction_history[]
-- [ ] **ENG-05**: `interview_npc` creates bidirectional KNOWS edges — NPC learns what player shares, not just player learns from NPC
+- [ ] **ENG-05**: `interview_npc` creates bidirectional KNOWS edges -- NPC learns what player shares, not just player learns from NPC
 - [ ] **ENG-06**: `interview_npc` appends to NPC's interaction_history after each conversation
 - [ ] **ENG-07**: `investigate` guards against duplicate KNOWS edges (existing bug fix)
 - [ ] **ENG-08**: Opinion edge created for new NPCs on first interaction (existing bug fix)
@@ -66,14 +66,14 @@
 
 - [ ] **PERS-01**: Each user has their own directory with world files stored as .rpg JSON
 - [ ] **PERS-02**: World auto-saves after each turn (atomic write)
-- [ ] **PERS-03**: User can close browser and return later — world state is intact
+- [ ] **PERS-03**: User can close browser and return later -- world state is intact
 - [ ] **PERS-04**: Session restoration generates "Previously on..." summary from graph event nodes
 - [ ] **PERS-05**: User can have multiple worlds/campaigns
 - [ ] **PERS-06**: World picker screen for choosing which world to continue or starting new
 
 ### Onboarding
 
-- [ ] **ONB-01**: New game starts the fugue state onboarding flow (vignette → fork → deepening → world gen → character grounding → catalyst)
+- [ ] **ONB-01**: New game starts the fugue state onboarding flow (vignette -> fork -> deepening -> world gen -> character grounding -> catalyst)
 - [ ] **ONB-02**: Onboarding creates NPCs with full structured properties (backstory, voice, arc)
 - [ ] **ONB-03**: No fourth wall breaks, menus, or character creation screens during onboarding
 - [ ] **ONB-04**: Onboarding logic lives server-side in the system prompt (invisible to player)
@@ -89,13 +89,13 @@
 
 ### Cost Optimization
 
-- **COST-01**: Model switching — Haiku for backend plumbing, Sonnet/Opus for narration
+- **COST-01**: Model switching -- Haiku for backend plumbing, Sonnet/Opus for narration
 - **COST-02**: Conversation history sliding window with summarization
 - **COST-03**: Prompt caching for tool definitions and system prompt
 
 ### Enhanced NPCs
 
-- **NPC-01**: NPC sub-agents — separate Claude instances per NPC with isolated context
+- **NPC-01**: NPC sub-agents -- separate Claude instances per NPC with isolated context
 - **NPC-02**: NPC emotional state tracking beyond opinion weight
 
 ### Mobile & Polish
@@ -118,8 +118,8 @@
 | User-facing lorebook/graph editor | Breaks immersion, graph manages itself |
 | Content filters UI | Closed playtest with trusted engineers, Anthropic API has built-in safety |
 | Admin dashboard | 10 users, use server logs |
-| Undo/rollback world state | Undermines consequence system — regenerate only |
-| Chat history search | Graph is the memory, not chat — wrong mental model |
+| Undo/rollback world state | Undermines consequence system -- regenerate only |
+| Chat history search | Graph is the memory, not chat -- wrong mental model |
 | Analytics/metrics | Premature for playtest |
 
 ## Traceability
@@ -175,16 +175,16 @@
 | ONB-02 | Phase 5 | Pending |
 | ONB-03 | Phase 5 | Pending |
 | ONB-04 | Phase 5 | Pending |
-| DEP-01 | Phase 6 | Pending |
-| DEP-02 | Phase 6 | Pending |
-| DEP-03 | Phase 6 | Pending |
-| DEP-04 | Phase 6 | Pending |
+| DEP-01 | Phase 5 | Pending |
+| DEP-02 | Phase 5 | Pending |
+| DEP-03 | Phase 5 | Pending |
+| DEP-04 | Phase 5 | Pending |
 
 **Coverage:**
 - v1 requirements: 48 total
-- Mapped to phases: 48
-- Unmapped: 0 ✓
+- Mapped to phases: 48 (across 5 phases)
+- Unmapped: 0
 
 ---
 *Requirements defined: 2026-04-03*
-*Last updated: 2026-04-03 after initial definition*
+*Last updated: 2026-04-03 after roadmap creation (DEP reqs merged into Phase 5)*
