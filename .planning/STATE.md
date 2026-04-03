@@ -9,29 +9,29 @@ See: .planning/PROJECT.md (updated 2026-04-03)
 
 ## Current Position
 
-Phase: 1 of 5 (Engine Extraction)
-Plan: 1 of 2 in current phase
-Status: Executing
-Last activity: 2026-04-03 -- Completed 01-01-PLAN.md (engine extraction)
+Phase: 1 of 5 (Engine Extraction) -- COMPLETE
+Plan: 2 of 2 in current phase
+Status: Phase Complete
+Last activity: 2026-04-03 -- Completed 01-02-PLAN.md (NPC types + interview fixes)
 
-Progress: [█░░░░░░░░░] 10%
+Progress: [██░░░░░░░░] 20%
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 1
-- Average duration: 4min
-- Total execution time: 0.07 hours
+- Total plans completed: 2
+- Average duration: 3min
+- Total execution time: 0.10 hours
 
 **By Phase:**
 
 | Phase | Plans | Total | Avg/Plan |
 |-------|-------|-------|----------|
-| 01-engine-extraction | 1 | 4min | 4min |
+| 01-engine-extraction | 2 | 6min | 3min |
 
 **Recent Trend:**
-- Last 5 plans: 4min
-- Trend: -
+- Last 5 plans: 4min, 2min
+- Trend: Improving
 
 *Updated after each plan completion*
 
@@ -47,6 +47,9 @@ Recent decisions affecting current work:
 - 01-01: Used file: dependency link (not npm workspace) to keep mcp-server and engine loosely coupled
 - 01-01: Tool definitions live in engine package so both MCP and future web adapters can share them
 - 01-01: Campaign management handlers stay in server.ts because they use node:fs directly (adapter-specific)
+- 01-02: NPC types are optional interfaces, not runtime-validated -- TypeScript guides developers without schema enforcement
+- 01-02: Interaction history is append-only on NPC properties, not separate graph nodes
+- 01-02: Bidirectional KNOWS uses same edge type with discovered_via: player_shared property
 
 ### Pending Todos
 
@@ -61,5 +64,5 @@ None yet.
 ## Session Continuity
 
 Last session: 2026-04-03
-Stopped at: Completed 01-01-PLAN.md (engine extraction into @rpg-engine/core)
+Stopped at: Completed 01-02-PLAN.md (NPC types + interview fixes). Phase 1 complete.
 Resume file: None
