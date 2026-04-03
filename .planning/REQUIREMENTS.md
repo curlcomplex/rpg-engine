@@ -18,18 +18,18 @@
 
 ### Authentication
 
-- [ ] **AUTH-01**: User can register with an invite code, username, and password
-- [ ] **AUTH-02**: Invalid or already-used invite codes are rejected with clear error
-- [ ] **AUTH-03**: User can log in with username and password
+- [x] **AUTH-01**: User can register with an invite code, username, and password
+- [x] **AUTH-02**: Invalid or already-used invite codes are rejected with clear error
+- [x] **AUTH-03**: User can log in with username and password
 - [x] **AUTH-04**: User session persists across browser refresh (HTTP-only cookie)
-- [ ] **AUTH-05**: User can log out
+- [x] **AUTH-05**: User can log out
 
 ### API Key Management
 
-- [ ] **KEY-01**: User can enter their Anthropic API key on a settings page
-- [ ] **KEY-02**: API key is encrypted at rest (AES-256-GCM) on the server
-- [ ] **KEY-03**: API key is validated on entry (test API call to Anthropic)
-- [ ] **KEY-04**: User without a valid API key cannot start a game (clear error directing them to settings)
+- [x] **KEY-01**: User can enter their Anthropic API key on a settings page
+- [x] **KEY-02**: API key is encrypted at rest (AES-256-GCM) on the server
+- [x] **KEY-03**: API key is validated on entry (test API call to Anthropic)
+- [x] **KEY-04**: User without a valid API key cannot start a game (clear error directing them to settings)
 
 ### Chat Interface
 
@@ -134,15 +134,15 @@
 | ENG-06 | Phase 1 | Complete |
 | ENG-07 | Phase 1 | Complete |
 | ENG-08 | Phase 1 | Complete |
-| AUTH-01 | Phase 2 | Pending |
-| AUTH-02 | Phase 2 | Pending |
-| AUTH-03 | Phase 2 | Pending |
+| AUTH-01 | Phase 2 | Complete |
+| AUTH-02 | Phase 2 | Complete |
+| AUTH-03 | Phase 2 | Complete |
 | AUTH-04 | Phase 2 | Complete |
-| AUTH-05 | Phase 2 | Pending |
-| KEY-01 | Phase 2 | Pending |
-| KEY-02 | Phase 2 | Pending |
-| KEY-03 | Phase 2 | Pending |
-| KEY-04 | Phase 2 | Pending |
+| AUTH-05 | Phase 2 | Complete |
+| KEY-01 | Phase 2 | Complete |
+| KEY-02 | Phase 2 | Complete |
+| KEY-03 | Phase 2 | Complete |
+| KEY-04 | Phase 2 | Complete |
 | API-01 | Phase 3 | Pending |
 | API-02 | Phase 3 | Pending |
 | API-03 | Phase 3 | Pending |
