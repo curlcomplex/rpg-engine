@@ -7,3 +7,10 @@ packages/*/dist/
 .superpowers/
 node_modules/
 mcp-server/dist/
+
+# Web app
+.env*
+.env.local
+data/
+web/.next/
+web/node_modules/
