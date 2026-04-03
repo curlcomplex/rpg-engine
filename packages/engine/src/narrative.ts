@@ -1,4 +1,4 @@
-import type { WorldDocument, GameNode, GameEdge, EdgeType } from './types.js';
+import type { WorldDocument, GameNode, GameEdge, EdgeType, InteractionRecord } from './types.js';
 import { ACTIVE_STATUSES } from './types.js';
 import { WorldStore } from './store.js';
 import { resolveCheck, rollD20, getSkillModifier } from './dice.js';
@@ -208,6 +208,7 @@ export interface InterviewParams {
   npc_id: string;
   topic?: string;
   approach?: 'friendly' | 'intimidating' | 'deceptive';
+  info_shared_by_player?: string[];  // Node IDs of info the player shares with the NPC
 }
 
 export interface InterviewResult {
@@ -334,6 +335,25 @@ export async function interviewNpc(
     }
   }
 
+  // ENG-05: Bidirectional -- NPC learns what player shares
+  if (params.info_shared_by_player) {
+    for (const infoId of params.info_shared_by_player) {
+      const npcAlreadyKnows = doc.edges.some(
+        e => e.type === 'knows' && e.source === params.npc_id && e.target === infoId
+      );
+      if (!npcAlreadyKnows) {
+        await store.addEdge({
+          id: store.edgeId(),
+          source: params.npc_id,
+          target: infoId,
+          type: 'knows',
+          properties: { discovered_via: 'player_shared', during_interview: true },
+          created_at: new Date().toISOString(),
+        });
+      }
+    }
+  }
+
   // Build exclusion list: things the PLAYER knows that this NPC does NOT know.
   // This prevents the narrator from accidentally leaking player knowledge into NPC dialogue.
   const npcKnowsIds = new Set(
@@ -350,18 +370,46 @@ export async function interviewNpc(
     })
     .filter((item): item is NonNullable<typeof item> => item !== null);
 
-  // Update NPC opinion via remove + re-add
-  if (opinion_change !== 0 && opinionEdge) {
-    const newWeight = Math.max(-100, Math.min(100, npc_opinion + opinion_change));
-    await store.removeEdge(opinionEdge.id);
-    await store.addEdge({
-      id: store.edgeId(),
-      source: params.npc_id,
-      target: params.character_id,
-      type: 'opinion',
-      properties: { ...opinionEdge.properties, weight: newWeight },
-      created_at: new Date().toISOString(),
-    });
+  // ENG-06: Append to NPC's interaction_history
+  const npcProps = (npc.properties || {}) as Record<string, unknown>;
+  const history = (npcProps.interaction_history as InteractionRecord[] | undefined) || [];
+  history.push({
+    session: doc.player.session_count,
+    summary: `Discussed ${params.topic || 'general topics'} via ${params.approach || 'friendly'} approach`,
+    info_shared_by_npc: information_shared.map(i => i.id),
+    info_shared_by_player: params.info_shared_by_player || [],
+    opinion_shift: opinion_change,
+    emotional_state: dice.success ? 'cooperative' : 'guarded',
+  });
+  await store.updateNode(params.npc_id, {
+    properties: { ...npcProps, interaction_history: history },
+  });
+
+  // Update NPC opinion via remove + re-add (ENG-08: also create for new NPCs)
+  if (opinion_change !== 0) {
+    if (opinionEdge) {
+      // Update existing opinion edge
+      const newWeight = Math.max(-100, Math.min(100, npc_opinion + opinion_change));
+      await store.removeEdge(opinionEdge.id);
+      await store.addEdge({
+        id: store.edgeId(),
+        source: params.npc_id,
+        target: params.character_id,
+        type: 'opinion',
+        properties: { ...opinionEdge.properties, weight: newWeight },
+        created_at: new Date().toISOString(),
+      });
+    } else {
+      // Create new opinion edge for first interaction (ENG-08)
+      await store.addEdge({
+        id: store.edgeId(),
+        source: params.npc_id,
+        target: params.character_id,
+        type: 'opinion',
+        properties: { weight: opinion_change },
+        created_at: new Date().toISOString(),
+      });
+    }
   }
 
   return {
