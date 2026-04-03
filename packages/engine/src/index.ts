@@ -17,6 +17,10 @@ export type {
   GameNode,
   GameEdge,
   WorldDocument,
+  NpcVoice,
+  NpcArc,
+  InteractionRecord,
+  NpcProperties,
 } from './types.js';
 
 // --- Store ---

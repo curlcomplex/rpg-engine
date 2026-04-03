@@ -181,16 +181,21 @@ export async function investigate(
   const new_edges: GameEdge[] = [];
 
   for (const clue of clues_found) {
-    const edge: GameEdge = {
-      id: store.edgeId(),
-      source: params.character_id,
-      target: clue.id,
-      type: 'knows',
-      properties: { discovered_via: 'investigation', at_location: params.location_id },
-      created_at: new Date().toISOString(),
-    };
-    await store.addEdge(edge);
-    new_edges.push(edge);
+    const alreadyKnows = doc.edges.some(
+      e => e.type === 'knows' && e.source === params.character_id && e.target === clue.id
+    );
+    if (!alreadyKnows) {
+      const edge: GameEdge = {
+        id: store.edgeId(),
+        source: params.character_id,
+        target: clue.id,
+        type: 'knows',
+        properties: { discovered_via: 'investigation', at_location: params.location_id },
+        created_at: new Date().toISOString(),
+      };
+      await store.addEdge(edge);
+      new_edges.push(edge);
+    }
   }
 
   return { dice, clues_found, new_edges, narrative_hint };

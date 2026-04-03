@@ -95,3 +95,37 @@ export interface WorldDocument {
   nodes: GameNode[];
   edges: GameEdge[];
 }
+
+// --- NPC structured properties ---
+
+export interface NpcVoice {
+  cadence: string;
+  vocabulary: string;
+  tics: string;
+  formality: string;
+}
+
+export interface NpcArc {
+  lie: string;
+  wound: string;
+  truth: string;
+}
+
+export interface InteractionRecord {
+  session: number;
+  summary: string;
+  info_shared_by_npc: string[];
+  info_shared_by_player: string[];
+  opinion_shift: number;
+  emotional_state: string;
+}
+
+export interface NpcProperties {
+  backstory?: string;
+  voice?: NpcVoice;
+  arc?: NpcArc;
+  interaction_history?: InteractionRecord[];
+  stats?: Record<string, number>;
+  skills?: Record<string, number>;
+  [key: string]: unknown;
+}
