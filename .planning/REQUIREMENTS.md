@@ -21,7 +21,7 @@
 - [ ] **AUTH-01**: User can register with an invite code, username, and password
 - [ ] **AUTH-02**: Invalid or already-used invite codes are rejected with clear error
 - [ ] **AUTH-03**: User can log in with username and password
-- [ ] **AUTH-04**: User session persists across browser refresh (HTTP-only cookie)
+- [x] **AUTH-04**: User session persists across browser refresh (HTTP-only cookie)
 - [ ] **AUTH-05**: User can log out
 
 ### API Key Management
@@ -137,7 +137,7 @@
 | AUTH-01 | Phase 2 | Pending |
 | AUTH-02 | Phase 2 | Pending |
 | AUTH-03 | Phase 2 | Pending |
-| AUTH-04 | Phase 2 | Pending |
+| AUTH-04 | Phase 2 | Complete |
 | AUTH-05 | Phase 2 | Pending |
 | KEY-01 | Phase 2 | Pending |
 | KEY-02 | Phase 2 | Pending |

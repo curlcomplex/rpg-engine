@@ -2,16 +2,16 @@
 gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
-status: completed
-stopped_at: Completed 01-02-PLAN.md (NPC types + interview fixes). Phase 1 complete.
-last_updated: "2026-04-03T19:37:10.082Z"
-last_activity: 2026-04-03 -- Completed 01-02-PLAN.md (NPC types + interview fixes)
+status: executing
+stopped_at: Completed 02-01-PLAN.md (web scaffold + auth libs)
+last_updated: "2026-04-03T20:04:21.258Z"
+last_activity: 2026-04-03 -- Completed 02-01-PLAN.md (web scaffold + auth libs)
 progress:
   total_phases: 5
   completed_phases: 1
-  total_plans: 2
-  completed_plans: 2
-  percent: 20
+  total_plans: 5
+  completed_plans: 3
+  percent: 60
 ---
 
 # Project State
@@ -21,33 +21,34 @@ progress:
 See: .planning/PROJECT.md (updated 2026-04-03)
 
 **Core value:** Players come back the next day and their world is exactly where they left it -- NPCs remember, consequences cascade, stories have structure.
-**Current focus:** Phase 1: Engine Extraction
+**Current focus:** Phase 2: Auth and Storage
 
 ## Current Position
 
-Phase: 1 of 5 (Engine Extraction) -- COMPLETE
-Plan: 2 of 2 in current phase
-Status: Phase Complete
-Last activity: 2026-04-03 -- Completed 01-02-PLAN.md (NPC types + interview fixes)
+Phase: 2 of 5 (Auth and Storage)
+Plan: 1 of 3 in current phase -- COMPLETE
+Status: In Progress
+Last activity: 2026-04-03 -- Completed 02-01-PLAN.md (web scaffold + auth libs)
 
-Progress: [██░░░░░░░░] 20%
+Progress: [██████░░░░] 60%
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 2
+- Total plans completed: 3
 - Average duration: 3min
-- Total execution time: 0.10 hours
+- Total execution time: 0.17 hours
 
 **By Phase:**
 
 | Phase | Plans | Total | Avg/Plan |
 |-------|-------|-------|----------|
 | 01-engine-extraction | 2 | 6min | 3min |
+| 02-auth-and-storage | 1 | 4min | 4min |
 
 **Recent Trend:**
-- Last 5 plans: 4min, 2min
-- Trend: Improving
+- Last 5 plans: 4min, 2min, 4min
+- Trend: Stable
 
 *Updated after each plan completion*
 
@@ -66,6 +67,9 @@ Recent decisions affecting current work:
 - 01-02: NPC types are optional interfaces, not runtime-validated -- TypeScript guides developers without schema enforcement
 - 01-02: Interaction history is append-only on NPC properties, not separate graph nodes
 - 01-02: Bidirectional KNOWS uses same edge type with discovered_via: player_shared property
+- 02-01: Used @node-rs/argon2 instead of argon2 (ABI issues on Node v25.6.0)
+- 02-01: Omitted --src-dir flag to match documented architecture paths (web/app/, web/lib/)
+- 02-01: DATA_DIR resolves relative to RPG root (process.cwd()/../data) not web/
 
 ### Pending Todos
 
@@ -79,6 +83,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-04-03
-Stopped at: Completed 01-02-PLAN.md (NPC types + interview fixes). Phase 1 complete.
+Last session: 2026-04-03T20:04:21.255Z
+Stopped at: Completed 02-01-PLAN.md (web scaffold + auth libs)
 Resume file: None
