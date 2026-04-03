@@ -4,6 +4,7 @@ import { cookies } from 'next/headers';
 export interface SessionData {
   userId?: string;
   username?: string;
+  hasApiKey?: boolean;
 }
 
 export const sessionOptions: SessionOptions = {

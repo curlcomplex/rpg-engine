@@ -26,6 +26,16 @@ export async function middleware(req: NextRequest) {
     return NextResponse.redirect(new URL('/login', req.url));
   }
 
+  // API key gate: authenticated users without an API key are redirected to settings
+  // Exempt: /settings (to avoid redirect loop), /api/settings/ (so the key can be saved)
+  if (
+    !session.hasApiKey &&
+    !pathname.startsWith('/settings') &&
+    !pathname.startsWith('/api/settings/')
+  ) {
+    return NextResponse.redirect(new URL('/settings?setup=api-key', req.url));
+  }
+
   return NextResponse.next();
 }
 
